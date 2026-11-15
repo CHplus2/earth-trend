@@ -100,6 +100,7 @@ export default function App() {
     setDemo(i);
     setRegionId(DEMOS[i].regionId);
     setVariableId(DEMOS[i].variableId);
+    setCompareId(DEMOS[i].compareVariableId ?? '');
     setRemoveSeason(true);
   }
 
@@ -123,7 +124,19 @@ export default function App() {
             {d.title}
           </button>
         ))}
-        {demo !== null && <p className="demo-text">{DEMOS[demo].text}</p>}
+        {demo !== null && (
+          <div className="demo-text">
+            <p>{DEMOS[demo].text}</p>
+            {DEMOS[demo].sources && (
+              <p className="sources">
+                Sources:{' '}
+                {DEMOS[demo].sources!.map((src) => (
+                  <a key={src.url} href={src.url} target="_blank" rel="noreferrer">{src.label}</a>
+                ))}
+              </p>
+            )}
+          </div>
+        )}
       </section>
 
       <main>

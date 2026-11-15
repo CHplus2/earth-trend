@@ -182,27 +182,58 @@ export const VARIABLES: Variable[] = [
 export interface DemoStep {
   regionId: string;
   variableId: string;
+  /** Optional second variable to compare against */
+  compareVariableId?: string;
   title: string;
   text: string;
+  sources?: Array<{ label: string; url: string }>;
 }
 
+// Numbers below come from the data in public/data (seasonal cycle removed,
+// Theil-Sen slope, Mann-Kendall test). Re-check them if you replace any file.
 export const DEMOS: DemoStep[] = [
   {
     regionId: 'china',
     variableId: 'no2',
-    title: 'Example 1: Pollution falls in China',
-    text: 'NO2 over the North China Plain rose until about 2011, then dropped after clean-air policy began. Watch how the straight-line trend is smaller than the real change because the series bends.',
+    title: 'Pollution rose, then fell',
+    text: 'Tropospheric NO2 over the North China Plain averaged about 10.5 (units of 1e15 molecules/cm²) in 2004, peaked near 13.3 in 2011, then fell to roughly 6 to 7 in 2024 to 2026. The overall trend is about -2.1 per decade (-22% per decade) and is significant, but one straight line hides the turning point. Published studies of satellite NO2 find the same rise to about 2011 and fall afterwards, and link the decline to air-pollution controls. This tool shows what changed, not why.',
+    sources: [
+      { label: 'Scientific Reports (2016): satellite NO2 and China NOx goals', url: 'https://www.nature.com/articles/srep35912' },
+      { label: 'Remote Sensing (2023): NO2, SO2 and AOD trends over South and East Asia', url: 'https://www.mdpi.com/2072-4292/15/20/5069' },
+    ],
   },
   {
     regionId: 'india',
     variableId: 'no2',
-    title: 'Example 2: Same pollutant, opposite direction',
-    text: 'Over the Indo-Gangetic Plain NO2 rises. The same variable trends down in China and the eastern US, yet each region follows its own causes.',
+    title: 'Same pollutant, opposite direction',
+    text: 'NO2 over the Indo-Gangetic Plain is rising by about 0.27 per decade (+12%), significant. Over the same years it is falling in the North China Plain (-22% per decade), the eastern US (-22%), California (-19%) and Iberia (-11%). The Amazon shows no clear trend. Click those regions on the map to compare. The data shows where NO2 is rising or falling, but not the reasons, which would need emissions records for each place.',
   },
   {
-    regionId: 'california',
+    regionId: 'amazon',
     variableId: 'tws',
-    title: 'Example 3: A drying valley',
-    text: 'Water storage in the Central Valley falls as groundwater is pumped during drought. Check whether the trend is significant after removing the seasonal cycle.',
+    compareVariableId: 'precip',
+    title: 'A drying Amazon',
+    text: 'In the southern Amazon, stored land water is falling by about 74 mm per decade (-4.3%) and rainfall by about 0.21 mm/day per decade (-3.9%); both are significant. Air temperature there rose by about 0.4 °C per decade over 1980 to 2026 (select Near-surface air temperature to see it). Month to month, water storage and rain move together (r = 0.35 after removing trends). Less rain and more heat are consistent with drier land, but land use and other factors were not tested, and the water-storage series is from a land model.',
+  },
+  {
+    regionId: 'barents',
+    variableId: 'sst',
+    compareVariableId: 'air850',
+    title: 'Fast warming in the Arctic',
+    text: 'In the Barents Sea the sea surface is warming by about 0.24 °C per decade, and the air 1.5 km up (850 hPa) by about 0.60 °C per decade, the fastest temperature trend in this tool. Air near 9 km (300 hPa) is warming by about 0.32 °C per decade. All three are significant. The sea-surface record has fewer months (265) because the Arctic winter leaves gaps.',
+  },
+  {
+    regionId: 'natlantic',
+    variableId: 'sst',
+    compareVariableId: 'air850',
+    title: 'Air warms, sea surface does not (yet)',
+    text: 'Over the North Atlantic box, air temperature is rising significantly at 850 hPa (about +0.23 °C per decade) and at 300 hPa (+0.27), but the sea surface trend (+0.06) is not significant. Month to month, sea and air above it are moderately linked (r = 0.48). A trend can be missing in one variable and clear in another, and a longer record could change the sea-surface result.',
+  },
+  {
+    regionId: 'india',
+    variableId: 'tws',
+    compareVariableId: 't2m',
+    title: 'Warming in five regions, but not India',
+    text: 'Air temperature has risen significantly over 1980 to 2026 in the southern Amazon (+0.40 °C per decade), the eastern US (+0.37), California (+0.32), Iberia (+0.29) and China (+0.26). In the Indo-Gangetic Plain there is no clear trend (-0.03). Yet stored land water there is falling by about 54 mm per decade (-6.4%), significant. So falling water storage does not require a warming trend, and different regions can behave differently.',
   },
 ];
