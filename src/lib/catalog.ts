@@ -133,7 +133,7 @@ export const VARIABLES: Variable[] = [
   {
     id: 'no2',
     name: 'Tropospheric NO2 column',
-    unit: '1e15 molecules/cm²',
+    unit: '×10¹⁵ molecules/cm²',
     scale: 1e-15,
     domain: 'atmosphere',
     regionTypes: ['land'],
@@ -196,7 +196,7 @@ export const DEMOS: DemoStep[] = [
     regionId: 'china',
     variableId: 'no2',
     title: 'Pollution rose, then fell',
-    text: 'Tropospheric NO2 over the North China Plain averaged about 10.5 (units of 1e15 molecules/cm²) in 2004, peaked near 13.3 in 2011, then fell to roughly 6 to 7 in 2024 to 2026. The overall trend is about -2.1 per decade (-22% per decade) and is significant, but one straight line hides the turning point. Published studies of satellite NO2 find the same rise to about 2011 and fall afterwards, and link the decline to air-pollution controls. This tool shows what changed, not why.',
+    text: 'Tropospheric NO2 over the North China Plain averaged about 10.5 (units of ×10¹⁵ molecules/cm²) in 2004, peaked near 13.3 in 2011, then fell to roughly 6 to 7 in 2024 to 2026. The overall trend is about -2.1 per decade (-22% per decade) and is significant, but one straight line hides the turning point. Published studies of satellite NO2 find the same rise to about 2011 and fall afterwards, and link the decline to air-pollution controls. This tool shows what changed, not why.',
     sources: [
       { label: 'Scientific Reports (2016): satellite NO2 and China NOx goals', url: 'https://www.nature.com/articles/srep35912' },
       { label: 'Remote Sensing (2023): NO2, SO2 and AOD trends over South and East Asia', url: 'https://www.mdpi.com/2072-4292/15/20/5069' },

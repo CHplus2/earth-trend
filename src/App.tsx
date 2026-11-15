@@ -23,7 +23,6 @@ export default function App() {
   const [synthetic, setSynthetic] = useState(false);
   const [demo, setDemo] = useState<number | null>(null);
   const [view, setView] = useState<'explore' | 'scan' | 'method'>('explore');
-  const [mapMode, setMapMode] = useState<'category' | 'trend'>('trend');
   const [trends, setTrends] = useState<Record<string, RegionTrend> | null>(null);
   const [mapFilter, setMapFilter] = useState<'all' | 'land' | 'ocean'>('all');
   const [compareId, setCompareId] = useState('');
@@ -194,24 +193,19 @@ export default function App() {
       <main>
         <div className="left">
           <div className="chips">
-            <span>Colour by:</span>
-            <button className={mapMode === 'trend' ? 'active' : ''} onClick={() => setMapMode('trend')}>Trend</button>
-            <button className={mapMode === 'category' ? 'active' : ''} onClick={() => setMapMode('category')}>Land / ocean</button>
-            <span className="gap" />
             <span>Show only:</span>
             {([['all', 'All'], ['land', 'Land'], ['ocean', 'Ocean']] as const).map(([k, label]) => (
               <button key={k} className={mapFilter === k ? 'active' : ''} onClick={() => chooseCategory(k)}>{label}</button>
             ))}
           </div>
-          {mapMode === 'trend' ? (
-            <p className="legend-line">
-              <i className="sw rise" /> rising <i className="sw fall" /> falling <i className="sw flat" /> no clear trend
-              &nbsp;for <strong>{variable.name}</strong>. Deeper colour means a clearer trend. Click a box to open it.
-            </p>
-          ) : (
-            <p className="legend-line"><i className="sw land" /> land <i className="sw ocean" /> ocean</p>
-          )}
-          <MapPicker selectedId={regionId} onSelect={pickRegion} filter={mapFilter} mode={mapMode} trends={trends} variable={variable} />
+          <p className="legend-line">
+            <span><i className="sw rise" /> rising</span>
+            <span><i className="sw fall" /> falling</span>
+            <span><i className="sw flat" /> no clear trend</span>
+            <span><i className="sw none" /> no data</span>
+          </p>
+          <p className="legend-note">Map colours show the trend of <strong>{variable.name}</strong>. Deeper colour means a clearer trend. Click a dot to open that region.</p>
+          <MapPicker selectedId={regionId} onSelect={pickRegion} filter={mapFilter} trends={trends} variable={variable} />
           <p className="blurb"><strong>{region.name}:</strong> {region.blurb}</p>
         </div>
 

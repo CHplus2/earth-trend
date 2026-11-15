@@ -32,7 +32,7 @@ Files live in `public/data` and are named `<variable>__<region>.csv`, with two u
 | `t2m` | Near-surface air temperature | MERRA-2 M2TMNXSLV, monthly | K to °C |
 | `precip` | Precipitation | GPM IMERG Final, monthly | mm/hr to mm/day |
 | `tws` | Terrestrial water storage | GLDAS Catchment DA1 v2.2, daily | none (mm) |
-| `no2` | Tropospheric NO2 column | OMI OMNO2d v004, daily | molecules/cm² to 1e15 |
+| `no2` | Tropospheric NO2 column | OMI OMNO2d v004, daily | molecules/cm² to ×10¹⁵ |
 | `sst` | Sea surface temperature | MODIS-Aqua 9 km, monthly (Day) | none (°C) |
 | `air850`, `air300` | Air temperature at 850 and 300 hPa | AIRS3STM v7.0, monthly (Daytime) | K to °C |
 

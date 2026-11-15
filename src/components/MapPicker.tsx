@@ -1,4 +1,5 @@
-import { MapContainer, TileLayer, Rectangle, Tooltip } from 'react-leaflet';
+import { Fragment } from 'react';
+import { MapContainer, TileLayer, Rectangle, CircleMarker, Tooltip } from 'react-leaflet';
 import type { LatLngBoundsExpression } from 'leaflet';
 import { REGIONS } from '../lib/catalog';
 import type { Variable } from '../lib/catalog';
@@ -7,30 +8,38 @@ import type { RegionTrend } from '../lib/regionTrends';
 interface Props {
   selectedId: string;
   onSelect: (id: string) => void;
-  /** Highlight only regions of this type; others are dimmed */
+  /** Dim regions of the other type */
   filter: 'all' | 'land' | 'ocean';
-  /** 'trend' colours each box by the trend of the chosen variable; 'category' by land/ocean */
-  mode: 'category' | 'trend';
   trends: Record<string, RegionTrend> | null;
   variable: Variable;
 }
 
-const CATEGORY = {
-  land: { base: '#4caf50', light: '#a5f0a8' },
-  ocean: { base: '#2196f3', light: '#9bd3ff' },
-};
 const RISING = '#ff7043';
 const FALLING = '#42a5f5';
-const NEUTRAL = '#9e9e9e';
+const NEUTRAL = '#b0bec5';
 
 const fmt = (v: number) => {
   const a = Math.abs(v);
-  return (v < 0 ? '-' : '+') + (a >= 100 ? a.toFixed(0) : a >= 10 ? a.toFixed(1) : a >= 1 ? a.toFixed(2) : a.toFixed(3));
+  return (v < 0 ? '-' : '+') + (a >= 100 ? a.toFixed(0) : a >= 10 ? a.toFixed(1) : a >= 0.1 ? a.toFixed(2) : a.toFixed(3));
 };
 
-export default function MapPicker({ selectedId, onSelect, filter, mode, trends, variable }: Props) {
+// Shows every region at once on first load.
+const WORLD: LatLngBoundsExpression = [
+  [-25, -175],
+  [82, 175],
+];
+
+export default function MapPicker({ selectedId, onSelect, filter, trends, variable }: Props) {
   return (
-    <MapContainer center={[25, 10]} zoom={2} minZoom={2} worldCopyJump className="map">
+    <MapContainer
+      bounds={WORLD}
+      boundsOptions={{ padding: [4, 4] }}
+      minZoom={1}
+      zoomSnap={0.25}
+      zoomDelta={0.5}
+      worldCopyJump
+      className="map"
+    >
       {/* NASA GIBS Blue Marble base layer: Earth imagery */}
       <TileLayer
         url="https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/BlueMarble_ShadedRelief_Bathymetry/default/GoogleMapsCompatible_Level8/{z}/{y}/{x}.jpeg"
@@ -46,51 +55,55 @@ export default function MapPicker({ selectedId, onSelect, filter, mode, trends, 
         const active = r.id === selectedId;
         const hasData = variable.regionTypes.includes(r.type);
         const t = trends?.[r.id];
+        const dimmed = filter !== 'all' && r.type !== filter && !active;
 
-        let fill: string;
-        let outline: string;
-        let fillOpacity: number;
-        let opacity = 1;
-        let label = r.name;
+        let colour = NEUTRAL;
+        let fillOpacity = 0.3;
+        let label = `${r.name}: no clear trend`;
+        let dashed = false;
 
-        if (mode === 'trend') {
-          if (!hasData || !t) {
-            fill = outline = NEUTRAL;
-            fillOpacity = 0.04;
-            opacity = 0.35;
-            label = `${r.name}: no ${variable.name.toLowerCase()} data`;
-          } else if (!t.sig) {
-            fill = outline = NEUTRAL;
-            fillOpacity = 0.25;
-            label = `${r.name}: no clear trend`;
-          } else {
-            fill = outline = t.z > 0 ? RISING : FALLING;
-            fillOpacity = Math.min(0.7, 0.3 + (Math.abs(t.z) / 8) * 0.4);
-            label = `${r.name}: ${fmt(t.perDecade)} ${variable.unit} per decade`;
-          }
-          if (active) outline = '#ffd23f';
-        } else {
-          const dim = filter !== 'all' && r.type !== filter && !active;
-          const c = CATEGORY[r.type];
-          fill = active ? c.light : c.base;
-          outline = fill;
-          fillOpacity = active ? 0.6 : dim ? 0.05 : 0.3;
-          opacity = dim ? 0.3 : 1;
+        if (!hasData || !t) {
+          fillOpacity = 0;
+          dashed = true;
+          label = `${r.name}: no ${variable.name.toLowerCase()} data`;
+        } else if (t.sig) {
+          colour = t.z > 0 ? RISING : FALLING;
+          fillOpacity = Math.min(0.75, 0.4 + (Math.abs(t.z) / 8) * 0.35);
+          label = `${r.name}: ${fmt(t.perDecade)} ${variable.unit} per decade`;
         }
-        if (filter !== 'all' && r.type !== filter && !active) {
-          fillOpacity = 0.03;
-          opacity = 0.25;
-        }
+        const opacity = dimmed ? 0.25 : 1;
+        const key = `${r.id}-${filter}-${active}-${variable.id}-${t ? t.z.toFixed(2) : 'x'}`;
 
         return (
-          <Rectangle
-            key={`${r.id}-${mode}-${filter}-${active}-${t ? t.z.toFixed(2) : 'x'}-${variable.id}`}
-            bounds={bounds}
-            pathOptions={{ color: outline, weight: active ? 4 : 2, fillColor: fill, fillOpacity, opacity }}
-            eventHandlers={{ click: () => onSelect(r.id) }}
-          >
-            <Tooltip sticky>{label}</Tooltip>
-          </Rectangle>
+          <Fragment key={key}>
+            <Rectangle
+              bounds={bounds}
+              pathOptions={{
+                color: active ? '#ffd23f' : colour,
+                weight: active ? 3 : 1.5,
+                fillColor: colour,
+                fillOpacity: dimmed ? 0.03 : fillOpacity * 0.6,
+                opacity,
+                dashArray: dashed ? '4 4' : undefined,
+              }}
+              eventHandlers={{ click: () => onSelect(r.id) }}
+            />
+            {/* Dot at the centre so small boxes stay visible and easy to click */}
+            <CircleMarker
+              center={[(s + n) / 2, (w + e) / 2]}
+              radius={active ? 10 : 8}
+              pathOptions={{
+                color: active ? '#ffd23f' : '#0b1626',
+                weight: active ? 3 : 1.5,
+                fillColor: colour,
+                fillOpacity: dimmed ? 0.15 : dashed ? 0.15 : 0.95,
+                opacity: dimmed ? 0.3 : 1,
+              }}
+              eventHandlers={{ click: () => onSelect(r.id) }}
+            >
+              <Tooltip sticky>{label}</Tooltip>
+            </CircleMarker>
+          </Fragment>
         );
       })}
     </MapContainer>
