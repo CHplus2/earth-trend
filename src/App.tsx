@@ -5,6 +5,7 @@ import StatsCard from './components/StatsCard';
 import CompareChart from './components/CompareChart';
 import CompareCard from './components/CompareCard';
 import Summary from './components/Summary';
+import Tour from './components/Tour';
 import Guide from './components/Guide';
 import ReadAloud from './components/ReadAloud';
 import ExplainCard from './components/ExplainCard';
@@ -26,6 +27,7 @@ export default function App() {
   const [error, setError] = useState<string | null>(null);
   const [synthetic, setSynthetic] = useState(false);
   const [demo, setDemo] = useState<number | null>(null);
+  const [tour, setTour] = useState(false);
   const [view, setView] = useState<'explore' | 'scan' | 'method'>('explore');
   const [trends, setTrends] = useState<Record<string, RegionTrend> | null>(null);
   const [mapLayer, setMapLayer] = useState<'variable' | 'temperature'>('temperature');
@@ -168,6 +170,15 @@ export default function App() {
     window.scrollTo({ top: 0 });
   }
 
+  function setupTour() {
+    setView('explore');
+    setRegionId('china');
+    setVariableId('no2');
+    setCompareId('');
+    setDemo(null);
+    setRemoveSeason(true);
+  }
+
   function startDemo(i: number) {
     setDemo(i);
     setRegionId(DEMOS[i].regionId);
@@ -202,6 +213,12 @@ export default function App() {
       {view === 'method' && <Method />}
 
       {view === 'explore' && (<>
+      <p className="tour-start">
+        <button className="active" onClick={() => { setView('explore'); setTour(true); }}>Watch a 1-minute demo</button>
+        <span className="muted"> A guided walk through one real case.</span>
+      </p>
+      {tour && <Tour onClose={() => setTour(false)} onSetup={setupTour} />}
+
       <Guide onOpen={openFromScanner} />
 
       <section className="demos">
@@ -229,7 +246,7 @@ export default function App() {
       </section>
 
       <main id="main">
-        <div className="left">
+        <div className="left" data-tour="map">
           <div className="chips">
             <span>Map shows:</span>
             {([['all', 'All (temperature)'], ['land', 'Land'], ['ocean', 'Ocean']] as const).map(([k, label]) => (
@@ -255,7 +272,7 @@ export default function App() {
         </div>
 
         <div className="right">
-          <div className="controls">
+          <div className="controls" data-tour="controls">
             <label className="wide">
               Place
               <select value={regionId} onChange={(e) => pickRegion(e.target.value)}>
@@ -292,10 +309,10 @@ export default function App() {
           {series && trend && (
             <>
               {raw && <ReadAloud selector=".summary" />}
-              {raw && <Summary variableName={variable.name} regionName={region.name} unit={variable.unit} raw={raw} trend={trend} showPercent={variable.unit !== '°C'} />}
-              <TrendChart points={series} trend={trend} unit={variable.unit} anomalies={removeSeason} />
-              <StatsCard trend={trend} unit={variable.unit} />
-              <ExplainCard unit={variable.unit} variableName={variable.name} enso={enso} isNinoBox={regionId === 'nino34'} turning={turning} />
+              {raw && <div data-tour="summary"><Summary variableName={variable.name} regionName={region.name} unit={variable.unit} raw={raw} trend={trend} showPercent={variable.unit !== '°C'} /></div>}
+              <div data-tour="chart"><TrendChart points={series} trend={trend} unit={variable.unit} anomalies={removeSeason} /></div>
+              <div data-tour="stats"><StatsCard trend={trend} unit={variable.unit} /></div>
+              <div data-tour="explain"><ExplainCard unit={variable.unit} variableName={variable.name} enso={enso} isNinoBox={regionId === 'nino34'} turning={turning} /></div>
             </>
           )}
 
