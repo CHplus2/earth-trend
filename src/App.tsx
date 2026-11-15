@@ -5,6 +5,8 @@ import StatsCard from './components/StatsCard';
 import CompareChart from './components/CompareChart';
 import CompareCard from './components/CompareCard';
 import Summary from './components/Summary';
+import ExplainCard from './components/ExplainCard';
+import { adjustForEnso, findTurningPoint } from './lib/explain';
 import Scanner from './components/Scanner';
 import Method from './components/Method';
 import { computeRegionTrends } from './lib/regionTrends';
@@ -93,6 +95,16 @@ export default function App() {
 
   const series = useMemo(() => (raw ? (removeSeason ? deseasonalize(raw) : raw) : null), [raw, removeSeason]);
   const trend = useMemo(() => (series ? analyzeTrend(series) : null), [series]);
+
+  // El Nino index: sea surface temperature in the Nino 3.4 box.
+  const [nino, setNino] = useState<Point[] | null>(null);
+  useEffect(() => {
+    const sst = VARIABLES.find((v) => v.id === 'sst')!;
+    loadVariableSeries(sst, 'nino34').then(setNino).catch(() => setNino(null));
+  }, []);
+  const anomalies = useMemo(() => (raw ? deseasonalize(raw) : null), [raw]);
+  const enso = useMemo(() => (anomalies && nino && regionId !== 'nino34' ? adjustForEnso(anomalies, nino) : null), [anomalies, nino, regionId]);
+  const turning = useMemo(() => (anomalies ? findTurningPoint(anomalies) : null), [anomalies]);
 
   const series2 = useMemo(() => (raw2 ? (removeSeason ? deseasonalize(raw2) : raw2) : null), [raw2, removeSeason]);
   const trend2 = useMemo(() => (series2 ? analyzeTrend(series2) : null), [series2]);
@@ -229,7 +241,7 @@ export default function App() {
             {mapLayer === 'temperature' ? (
               <>Colours show the <strong>temperature</strong> trend: air temperature over land (1980 to 2026) and sea surface temperature over ocean (2002 to 2026). The records differ in length, so compare with care.</>
             ) : (
-              <>Colours show the trend of <strong>{variable.name}</strong>. Dashed circles mean this variable has no data there; choose "All" to colour every region by temperature.</>
+              <>Colours show the trend of <strong>{variable.name}</strong> ({mapFilter} regions only; it is the variable chosen in the menu). Dashed circles mean this variable has no data there; choose "All" to colour every region by temperature.</>
             )}{' '}
             Deeper colour means a clearer trend. Click a dot to open that region.
           </p>
@@ -266,6 +278,7 @@ export default function App() {
               {raw && <Summary variableName={variable.name} regionName={region.name} unit={variable.unit} raw={raw} trend={trend} showPercent={variable.unit !== '°C'} />}
               <TrendChart points={series} trend={trend} unit={variable.unit} anomalies={removeSeason} />
               <StatsCard trend={trend} unit={variable.unit} />
+              <ExplainCard unit={variable.unit} variableName={variable.name} enso={enso} isNinoBox={regionId === 'nino34'} turning={turning} />
             </>
           )}
 

@@ -128,3 +128,5 @@ footer { margin-top: 32px; padding-top: 16px; border-top: 1px solid var(--line-s
 .scanner .controls label.check { grid-column: auto; }
 
 .chart-caption { font-size: 13px; color: var(--muted); margin: 0 0 4px; }
+
+.card h4 { margin: 14px 0 4px; font-size: 14px; }
