@@ -243,3 +243,23 @@ details.evidence > .card { margin: 0; border: none; border-top: 1px solid var(--
   .mission .num { width: 24px; height: 24px; font-size: 13px; }
   .mission .txt strong { font-size: 13px; }
 }
+
+/* compact top on wide screens so the map is visible without scrolling */
+@media (min-width: 901px) {
+  .app { padding-top: 14px; }
+  header { margin-bottom: 10px; }
+  header.brand h1 { font-size: 28px; }
+  header.brand .tagline { font-size: 14px; margin-top: 2px; }
+  .kicker { font-size: 11px; }
+  .mission { margin-bottom: 10px; }
+  .mission button { min-height: 44px; padding: 6px 12px; }
+  .starters { margin-bottom: 10px; }
+  .starter { min-height: 44px; padding: 6px 12px; }
+  .starter .ico { width: 26px; height: 26px; }
+  .casefile { margin-bottom: 14px; padding: 10px 18px 12px; }
+  .case-top { margin-bottom: 4px; }
+  .case-title h2 { font-size: 21px; }
+  .readout { padding: 6px 10px; }
+  .readout dd { font-size: 21px; }
+  .badges { margin-top: 8px; }
+}
