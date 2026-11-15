@@ -306,3 +306,16 @@ details.legend-more .legend-note { margin: 4px 0 0; }
   .readout dd small { margin: 0; }
   .readout .conf { font-size: 16px; }
 }
+
+/* dropdowns: arrow with comfortable space from the border */
+select {
+  appearance: none;
+  -webkit-appearance: none;
+  padding-right: 38px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%23a7b8d3' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  background-size: 12px 8px;
+  text-overflow: ellipsis;
+}
+select:hover { border-color: var(--link); }
