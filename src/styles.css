@@ -274,3 +274,10 @@ details.legend-more .legend-note { margin: 4px 0 0; }
 .note.disagree { background: rgba(255,183,77,.08); border: 1px solid rgba(255,183,77,.35); border-radius: 8px; padding: 10px 12px; }
 .summary-action { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--line-soft); } .summary-action button.read { margin: 0; }
 .legend-line { margin-bottom: 12px; }
+.legend-title { margin-bottom: 4px; }
+.legend-line { gap: 6px 16px; }
+.readouts { gap: 16px; }
+.readout { padding: 12px 14px; }
+.readout dd { margin-top: 8px; gap: 4px; }
+.readout dd small { margin-top: 2px; }
+@media (min-width: 901px) { .readout { padding: 10px 14px; } }
