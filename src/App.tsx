@@ -24,7 +24,7 @@ export default function App() {
   const [demo, setDemo] = useState<number | null>(null);
   const [view, setView] = useState<'explore' | 'scan' | 'method'>('explore');
   const [trends, setTrends] = useState<Record<string, RegionTrend> | null>(null);
-  const [mapLayer, setMapLayer] = useState<'variable' | 'temperature'>('variable');
+  const [mapLayer, setMapLayer] = useState<'variable' | 'temperature'>('temperature');
   const [mapFilter, setMapFilter] = useState<'all' | 'land' | 'ocean'>('all');
   const [compareId, setCompareId] = useState('');
   const [raw2, setRaw2] = useState<Point[] | null>(null);
@@ -116,6 +116,8 @@ export default function App() {
 
   function chooseCategory(k: 'all' | 'land' | 'ocean') {
     setMapFilter(k);
+    // "All" shows temperature for every region; Land / Ocean colour by the selected variable.
+    setMapLayer(k === 'all' ? 'temperature' : 'variable');
     // The trend colours depend on the variable, so move to a region and variable of this kind.
     if (k !== 'all' && region.type !== k) {
       const first = REGIONS.find((r) => r.type === k);
@@ -213,12 +215,7 @@ export default function App() {
         <div className="left">
           <div className="chips">
             <span>Map shows:</span>
-            <button className={mapLayer === 'variable' ? 'active' : ''} onClick={() => setMapLayer('variable')}>Selected variable</button>
-            <button className={mapLayer === 'temperature' ? 'active' : ''} onClick={() => setMapLayer('temperature')}>Temperature, everywhere</button>
-          </div>
-          <div className="chips">
-            <span>Show only:</span>
-            {([['all', 'All'], ['land', 'Land'], ['ocean', 'Ocean']] as const).map(([k, label]) => (
+            {([['all', 'All (temperature)'], ['land', 'Land'], ['ocean', 'Ocean']] as const).map(([k, label]) => (
               <button key={k} className={mapFilter === k ? 'active' : ''} onClick={() => chooseCategory(k)}>{label}</button>
             ))}
           </div>
@@ -232,7 +229,7 @@ export default function App() {
             {mapLayer === 'temperature' ? (
               <>Colours show the <strong>temperature</strong> trend: air temperature over land (1980 to 2026) and sea surface temperature over ocean (2002 to 2026). The records differ in length, so compare with care.</>
             ) : (
-              <>Colours show the trend of <strong>{variable.name}</strong>. Dashed circles mean this variable has no data there; try "Temperature, everywhere" to colour every region.</>
+              <>Colours show the trend of <strong>{variable.name}</strong>. Dashed circles mean this variable has no data there; choose "All" to colour every region by temperature.</>
             )}{' '}
             Deeper colour means a clearer trend. Click a dot to open that region.
           </p>
