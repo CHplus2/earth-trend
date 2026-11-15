@@ -7,6 +7,8 @@ import CompareCard from './components/CompareCard';
 import Summary from './components/Summary';
 import Scanner from './components/Scanner';
 import Method from './components/Method';
+import { computeRegionTrends } from './lib/regionTrends';
+import type { RegionTrend } from './lib/regionTrends';
 import { DEMOS, REGIONS, VARIABLES } from './lib/catalog';
 import { loadManifest, loadVariableSeries } from './lib/data';
 import { analyzeTrend, correlate, deseasonalize } from './lib/stats';
@@ -21,6 +23,8 @@ export default function App() {
   const [synthetic, setSynthetic] = useState(false);
   const [demo, setDemo] = useState<number | null>(null);
   const [view, setView] = useState<'explore' | 'scan' | 'method'>('explore');
+  const [mapMode, setMapMode] = useState<'category' | 'trend'>('trend');
+  const [trends, setTrends] = useState<Record<string, RegionTrend> | null>(null);
   const [mapFilter, setMapFilter] = useState<'all' | 'land' | 'ocean'>('all');
   const [compareId, setCompareId] = useState('');
   const [raw2, setRaw2] = useState<Point[] | null>(null);
@@ -59,6 +63,15 @@ export default function App() {
       cancelled = true;
     };
   }, [compareId, variableId, regionId]);
+
+  useEffect(() => {
+    let cancelled = false;
+    setTrends(null);
+    computeRegionTrends(variable).then((t) => !cancelled && setTrends(t));
+    return () => {
+      cancelled = true;
+    };
+  }, [variable]);
 
   const series = useMemo(() => (raw ? (removeSeason ? deseasonalize(raw) : raw) : null), [raw, removeSeason]);
   const trend = useMemo(() => (series ? analyzeTrend(series) : null), [series]);
@@ -168,13 +181,24 @@ export default function App() {
       <main>
         <div className="left">
           <div className="chips">
-            <span>Show on map:</span>
+            <span>Colour by:</span>
+            <button className={mapMode === 'trend' ? 'active' : ''} onClick={() => setMapMode('trend')}>Trend</button>
+            <button className={mapMode === 'category' ? 'active' : ''} onClick={() => setMapMode('category')}>Land / ocean</button>
+            <span className="gap" />
+            <span>Show:</span>
             {([['all', 'All'], ['land', 'Land'], ['ocean', 'Ocean']] as const).map(([k, label]) => (
               <button key={k} className={mapFilter === k ? 'active' : ''} onClick={() => setMapFilter(k)}>{label}</button>
             ))}
-            <span className="legend"><i className="sw land" /> land <i className="sw ocean" /> ocean</span>
           </div>
-          <MapPicker selectedId={regionId} onSelect={pickRegion} filter={mapFilter} />
+          {mapMode === 'trend' ? (
+            <p className="legend-line">
+              <i className="sw rise" /> rising <i className="sw fall" /> falling <i className="sw flat" /> no clear trend
+              &nbsp;for <strong>{variable.name}</strong>. Deeper colour means a clearer trend. Click a box to open it.
+            </p>
+          ) : (
+            <p className="legend-line"><i className="sw land" /> land <i className="sw ocean" /> ocean</p>
+          )}
+          <MapPicker selectedId={regionId} onSelect={pickRegion} filter={mapFilter} mode={mapMode} trends={trends} variable={variable} />
           <p className="blurb"><strong>{region.name}:</strong> {region.blurb}</p>
         </div>
 

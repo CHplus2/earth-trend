@@ -69,3 +69,7 @@ td.ok { color: #7be495; font-weight: 600; } td.maybe { color: #ffb74d; } td.none
   main .left { position: sticky; top: 12px; align-self: start; }
   main .left .map { height: calc(100vh - 150px); min-height: 360px; max-height: 620px; }
 }
+
+.chips .gap { width: 12px; }
+.legend-line { font-size: 13px; color: #9fb3d1; margin: 0 0 8px; line-height: 1.5; }
+.sw.rise { background: #ff7043; } .sw.fall { background: #42a5f5; } .sw.flat { background: #9e9e9e; }
