@@ -355,7 +355,7 @@ export default function App() {
 
       <footer>
         Trends are linear (Theil-Sen slope, Mann-Kendall test). Real climate signals can be non-linear, and a trend does not prove its cause.
-        Data: NASA Giovanni (MERRA-2, GPM IMERG, GLDAS, OMI, MODIS-Aqua, AIRS). Imagery: NASA GIBS.
+        Data: NASA Giovanni (MERRA-2, GPM IMERG, GLDAS, OMI, MODIS-Aqua, AIRS). Imagery: NASA GIBS. Code and text were written with AI assistance (Kiro), and every number is computed from the NASA data files.
       </footer>
     </div>
   );

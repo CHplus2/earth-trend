@@ -91,6 +91,7 @@ slides = f"""
   <ul><li>For students, teachers and curious people: a guided demo, plain-language answers, sourced examples</li><li>Honest about limits: "consistent with", never "proves"</li><li>Next: more regions, live NASA data, more languages</li></ul>
   <p class="cyan" style="margin-top:48px;font-size:36px"><b>{URL}</b></p>
   <p style="font-size:22px;color:#8396b5">Source code: github.com/CHplus2/earth-trend</p>
+  <p style="font-size:20px;color:#8396b5">Built with AI assistance (Kiro): code, text and slides. All numbers computed from NASA data.</p>
   {foot(7)}
 </section>
 """

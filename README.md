@@ -89,4 +89,6 @@ No environment variables are needed. Every push to `main` rebuilds the site.
 
 ## Credits
 
+**Use of Super Intelligence (SI):** the code, statistical routines, interface text, documentation and demo slides in this repository were written with an AI coding assistant (Kiro) and reviewed by the team. The app itself uses no AI at run time. Every number it shows is computed from the NASA data files.
+
 Data: NASA Giovanni (GES DISC) products listed above. Imagery: NASA GIBS (Blue Marble). Map: Leaflet. Charts: Recharts.
