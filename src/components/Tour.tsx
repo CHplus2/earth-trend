@@ -83,7 +83,7 @@ export default function Tour({ onClose, onSetup }: Props) {
       // Open a collapsed evidence panel so the highlighted part is visible.
       if (el instanceof HTMLDetailsElement) el.open = true;
       el?.classList.add('tour-hl');
-      el?.scrollIntoView({ block: 'center' });
+      el?.scrollIntoView({ block: window.innerWidth <= 900 ? 'start' : 'center' });
     }, 350);
     return () => {
       window.clearTimeout(t);
