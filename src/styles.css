@@ -236,3 +236,10 @@ details.evidence > .card { margin: 0; border: none; border-top: 1px solid var(--
 .summary, .card, .guide, .demo-text { box-shadow: 0 0 0 1px rgba(47,227,255,.06); }
 .map { border-color: #2c4a7c; box-shadow: var(--glow); }
 .starter .ico.play::before { content: ''; display: block; margin-left: 3px; border-style: solid; border-width: 7px 0 7px 11px; border-color: transparent transparent transparent #fff; }
+.mission button { min-width: 0; }
+@media (max-width: 560px) {
+  .mission { gap: 6px; }
+  .mission button { padding: 8px 8px; gap: 6px; }
+  .mission .num { width: 24px; height: 24px; font-size: 13px; }
+  .mission .txt strong { font-size: 13px; }
+}
