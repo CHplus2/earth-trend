@@ -28,7 +28,10 @@ export default function App() {
     setRaw(null);
     setError(null);
     loadSeries(variableId, regionId)
-      .then((p) => !cancelled && setRaw(p))
+      .then((p) => {
+        const k = VARIABLES.find((v) => v.id === variableId)?.scale ?? 1;
+        if (!cancelled) setRaw(k === 1 ? p : p.map((x) => ({ ...x, value: x.value * k })));
+      })
       .catch((e: Error) => !cancelled && setError(e.message));
     return () => {
       cancelled = true;

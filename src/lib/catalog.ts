@@ -16,6 +16,8 @@ export interface Variable {
   definition: string;
   /** First and last year available in the source product */
   years: string;
+  /** Multiply raw CSV values by this to get the displayed unit (default 1) */
+  scale?: number;
 }
 
 export const REGIONS: Region[] = [
@@ -89,6 +91,7 @@ export const VARIABLES: Variable[] = [
     id: 'no2',
     name: 'Tropospheric NO2 column',
     unit: '1e15 molecules/cm²',
+    scale: 1e-15,
     giovanni: 'OMI OMNO2d v004 (or monthly equivalent), tropospheric column, 30% cloud screened',
     definition:
       'The amount of nitrogen dioxide, a pollutant from traffic, power plants and industry, in the lower atmosphere above a spot, measured by the Ozone Monitoring Instrument.',
