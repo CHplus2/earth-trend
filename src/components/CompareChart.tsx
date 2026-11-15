@@ -19,12 +19,12 @@ export default function CompareChart({ a, b, nameA, nameB, unitA, unitB }: Props
       <ComposedChart data={data} margin={{ top: 10, right: 10, bottom: 10, left: 0 }}>
         <CartesianGrid strokeDasharray="3 3" stroke="#2a3a55" />
         <XAxis dataKey="t" type="number" domain={['dataMin', 'dataMax']} tickFormatter={(v: number) => String(Math.floor(v))} stroke="#9fb3d1" />
-        <YAxis yAxisId="a" stroke="#4fc3f7" domain={['auto', 'auto']} tickFormatter={(v: number) => v.toFixed(1)} label={{ value: unitA, angle: -90, position: 'insideLeft', fill: '#4fc3f7' }} />
-        <YAxis yAxisId="b" orientation="right" stroke="#ff8a65" domain={['auto', 'auto']} tickFormatter={(v: number) => v.toFixed(1)} label={{ value: unitB, angle: 90, position: 'insideRight', fill: '#ff8a65' }} />
+        <YAxis yAxisId="a" stroke="#4fc3f7" domain={['auto', 'auto']} tickFormatter={(v: number) => v.toFixed(1)} />
+        <YAxis yAxisId="b" orientation="right" stroke="#ff8a65" domain={['auto', 'auto']} tickFormatter={(v: number) => v.toFixed(1)} />
         <Tooltip contentStyle={{ background: '#0b1626', border: '1px solid #2a3a55' }} formatter={(v: number) => v.toFixed(3)} labelFormatter={(v: number) => v.toFixed(2)} />
         <Legend />
-        <Line yAxisId="a" dataKey="a" name={nameA} stroke="#4fc3f7" dot={false} strokeWidth={1.5} />
-        <Line yAxisId="b" dataKey="b" name={nameB} stroke="#ff8a65" dot={false} strokeWidth={1.5} connectNulls />
+        <Line yAxisId="a" dataKey="a" name={`${nameA} (${unitA})`} stroke="#4fc3f7" dot={false} strokeWidth={1.5} />
+        <Line yAxisId="b" dataKey="b" name={`${nameB} (${unitB})`} stroke="#ff8a65" dot={false} strokeWidth={1.5} connectNulls />
       </ComposedChart>
     </ResponsiveContainer>
   );
