@@ -291,3 +291,18 @@ details.legend-more .legend-note { margin: 4px 0 0; }
 .up, .down { font-weight: 600; }
 .status i { animation: none; }
 @media (max-width: 560px) { .chips button { min-height: 36px; } }
+
+/* compact case file on wide screens: more room for the map */
+@media (min-width: 901px) {
+  .casefile { padding: 10px 18px 12px; margin-bottom: 12px; }
+  .case-top { margin-bottom: 10px; }
+  .case-title h2 { font-size: 20px; }
+  .case-title p { margin: 2px 0 0; }
+  .case-title .badges { margin-top: 8px; }
+  .readouts { gap: 10px; }
+  .readout { padding: 6px 12px; }
+  .readout dt { font-size: 10px; }
+  .readout dd { flex-direction: row; align-items: baseline; flex-wrap: wrap; gap: 4px 8px; margin-top: 2px; font-size: 20px; }
+  .readout dd small { margin: 0; }
+  .readout .conf { font-size: 16px; }
+}

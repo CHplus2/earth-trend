@@ -54,6 +54,19 @@ export default function CaseFile({ variable, region, trend, enso, turning, loadi
         <div className="case-title">
           <h2 id="case-title">{variable.name}</h2>
           <p>{region.name}</p>
+      {trend && (
+            <ul className="badges" aria-label="Extra findings">
+              {turning?.reversal && <li className="badge hot">Turned around in {turning.year}</li>}
+              {enso && (enso.verdict === 'unchanged' || enso.verdict === 'strengthened') && trend.significant && (
+                <li className="badge ok">Not explained by El Niño</li>
+              )}
+              {enso && (enso.verdict === 'lost' || enso.verdict === 'weakened') && <li className="badge warn">Partly El Niño</li>}
+              {Math.sign(trend.olsSlopePerYear) !== Math.sign(trend.sensSlopePerYear) && (
+                <li className="badge warn">Slope methods disagree: see statistics</li>
+              )}
+              {trend.n / 12 < 15 && <li className="badge warn">Short record ({Math.round(trend.n / 12)} years)</li>}
+            </ul>
+          )}
         </div>
         <div className="case-verdict" aria-live="polite">
           <span className="stamp">{loading || !trend ? 'SCANNING…' : stamp}</span>
@@ -76,19 +89,6 @@ export default function CaseFile({ variable, region, trend, enso, turning, loadi
           </div>
         </dl>
       </div>
-      {trend && (
-        <ul className="badges" aria-label="Extra findings">
-          {turning?.reversal && <li className="badge hot">Turned around in {turning.year}</li>}
-          {enso && (enso.verdict === 'unchanged' || enso.verdict === 'strengthened') && trend.significant && (
-            <li className="badge ok">Not explained by El Niño</li>
-          )}
-          {enso && (enso.verdict === 'lost' || enso.verdict === 'weakened') && <li className="badge warn">Partly El Niño</li>}
-          {Math.sign(trend.olsSlopePerYear) !== Math.sign(trend.sensSlopePerYear) && (
-            <li className="badge warn">Slope methods disagree: see statistics</li>
-          )}
-          {trend.n / 12 < 15 && <li className="badge warn">Short record ({Math.round(trend.n / 12)} years)</li>}
-        </ul>
-      )}
     </section>
   );
 }
