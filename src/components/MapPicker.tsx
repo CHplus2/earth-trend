@@ -23,21 +23,22 @@ const fmt = (v: number) => {
   return (v < 0 ? '-' : '+') + (a >= 100 ? a.toFixed(0) : a >= 10 ? a.toFixed(1) : a >= 0.1 ? a.toFixed(2) : a.toFixed(3));
 };
 
-// Shows every region at once on first load.
-const WORLD: LatLngBoundsExpression = [
-  [-25, -175],
-  [82, 175],
+// Whole world on first load; panning is kept inside the map so no empty grey area shows.
+const WORLD_VIEW: LatLngBoundsExpression = [
+  [-85, -180],
+  [85, 180],
 ];
 
 export default function MapPicker({ selectedId, onSelect, filter, trends, variable }: Props) {
   return (
     <MapContainer
-      bounds={WORLD}
-      boundsOptions={{ padding: [4, 4] }}
-      minZoom={1}
+      center={[22, 10]}
+      zoom={1.5}
+      minZoom={1.5}
+      maxBounds={WORLD_VIEW}
+      maxBoundsViscosity={1}
       zoomSnap={0.25}
       zoomDelta={0.5}
-      worldCopyJump
       className="map"
     >
       {/* NASA GIBS Blue Marble base layer: Earth imagery */}
