@@ -9,7 +9,7 @@ import Scanner from './components/Scanner';
 import Method from './components/Method';
 import { computeRegionTrends } from './lib/regionTrends';
 import type { RegionTrend } from './lib/regionTrends';
-import { DEMOS, REGIONS, VARIABLES } from './lib/catalog';
+import { DEMOS, REGIONS, TEMPERATURE_EVERYWHERE, VARIABLES } from './lib/catalog';
 import { loadManifest, loadVariableSeries } from './lib/data';
 import { analyzeTrend, correlate, deseasonalize } from './lib/stats';
 import type { Point } from './lib/stats';
@@ -24,6 +24,7 @@ export default function App() {
   const [demo, setDemo] = useState<number | null>(null);
   const [view, setView] = useState<'explore' | 'scan' | 'method'>('explore');
   const [trends, setTrends] = useState<Record<string, RegionTrend> | null>(null);
+  const [mapLayer, setMapLayer] = useState<'variable' | 'temperature'>('variable');
   const [mapFilter, setMapFilter] = useState<'all' | 'land' | 'ocean'>('all');
   const [compareId, setCompareId] = useState('');
   const [raw2, setRaw2] = useState<Point[] | null>(null);
@@ -66,11 +67,29 @@ export default function App() {
   useEffect(() => {
     let cancelled = false;
     setTrends(null);
-    computeRegionTrends(variable).then((t) => !cancelled && setTrends(t));
+    if (mapLayer === 'temperature') {
+      const t2m = VARIABLES.find((v) => v.id === 't2m')!;
+      const sst = VARIABLES.find((v) => v.id === 'sst')!;
+      Promise.all([computeRegionTrends(t2m), computeRegionTrends(sst)]).then(
+        ([a, b]) => !cancelled && setTrends({ ...a, ...b }),
+      );
+    } else {
+      computeRegionTrends(variable).then((t) => !cancelled && setTrends(t));
+    }
     return () => {
       cancelled = true;
     };
-  }, [variable]);
+  }, [variable, mapLayer]);
+
+  const mapVariable = mapLayer === 'temperature' ? TEMPERATURE_EVERYWHERE : variable;
+
+  function selectFromMap(id: string) {
+    pickRegion(id);
+    if (mapLayer === 'temperature') {
+      const r = REGIONS.find((x) => x.id === id)!;
+      setVariableId(r.type === 'land' ? 't2m' : 'sst');
+    }
+  }
 
   const series = useMemo(() => (raw ? (removeSeason ? deseasonalize(raw) : raw) : null), [raw, removeSeason]);
   const trend = useMemo(() => (series ? analyzeTrend(series) : null), [series]);
@@ -193,6 +212,11 @@ export default function App() {
       <main>
         <div className="left">
           <div className="chips">
+            <span>Map shows:</span>
+            <button className={mapLayer === 'variable' ? 'active' : ''} onClick={() => setMapLayer('variable')}>Selected variable</button>
+            <button className={mapLayer === 'temperature' ? 'active' : ''} onClick={() => setMapLayer('temperature')}>Temperature, everywhere</button>
+          </div>
+          <div className="chips">
             <span>Show only:</span>
             {([['all', 'All'], ['land', 'Land'], ['ocean', 'Ocean']] as const).map(([k, label]) => (
               <button key={k} className={mapFilter === k ? 'active' : ''} onClick={() => chooseCategory(k)}>{label}</button>
@@ -204,8 +228,15 @@ export default function App() {
             <span><i className="sw flat" /> no clear trend</span>
             <span><i className="sw none" /> no data</span>
           </p>
-          <p className="legend-note">Map colours show the trend of <strong>{variable.name}</strong>. Deeper colour means a clearer trend. Click a dot to open that region.</p>
-          <MapPicker selectedId={regionId} onSelect={pickRegion} filter={mapFilter} trends={trends} variable={variable} />
+          <p className="legend-note">
+            {mapLayer === 'temperature' ? (
+              <>Colours show the <strong>temperature</strong> trend: air temperature over land (1980 to 2026) and sea surface temperature over ocean (2002 to 2026). The records differ in length, so compare with care.</>
+            ) : (
+              <>Colours show the trend of <strong>{variable.name}</strong>. Dashed circles mean this variable has no data there; try "Temperature, everywhere" to colour every region.</>
+            )}{' '}
+            Deeper colour means a clearer trend. Click a dot to open that region.
+          </p>
+          <MapPicker selectedId={regionId} onSelect={selectFromMap} filter={mapFilter} trends={trends} variable={mapVariable} />
           <p className="blurb"><strong>{region.name}:</strong> {region.blurb}</p>
         </div>
 

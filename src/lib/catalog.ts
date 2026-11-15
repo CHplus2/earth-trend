@@ -179,6 +179,21 @@ export const VARIABLES: Variable[] = [
   },
 ];
 
+/**
+ * Map-only layer: lets every region get a colour at once.
+ * Land regions use near-surface air temperature, ocean regions use sea surface temperature.
+ */
+export const TEMPERATURE_EVERYWHERE: Variable = {
+  id: 'temp_all',
+  name: 'Temperature (air over land, sea surface over ocean)',
+  unit: '°C',
+  domain: 'atmosphere',
+  regionTypes: ['land', 'ocean'],
+  giovanni: 'MERRA-2 near-surface air temperature (land) and MODIS-Aqua sea surface temperature (ocean)',
+  definition: 'A combined view of temperature trends across land and ocean.',
+  years: '1980 to present (land), 2002 to present (ocean)',
+};
+
 export interface DemoStep {
   regionId: string;
   variableId: string;
