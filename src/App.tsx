@@ -5,6 +5,7 @@ import StatsCard from './components/StatsCard';
 import CompareChart from './components/CompareChart';
 import CompareCard from './components/CompareCard';
 import Summary from './components/Summary';
+import Scanner from './components/Scanner';
 import { DEMOS, REGIONS, VARIABLES } from './lib/catalog';
 import { loadManifest, loadVariableSeries } from './lib/data';
 import { analyzeTrend, correlate, deseasonalize } from './lib/stats';
@@ -18,6 +19,7 @@ export default function App() {
   const [error, setError] = useState<string | null>(null);
   const [synthetic, setSynthetic] = useState(false);
   const [demo, setDemo] = useState<number | null>(null);
+  const [view, setView] = useState<'explore' | 'scan'>('explore');
   const [compareId, setCompareId] = useState('');
   const [raw2, setRaw2] = useState<Point[] | null>(null);
   const [error2, setError2] = useState<string | null>(null);
@@ -96,6 +98,16 @@ export default function App() {
     ));
   }
 
+  function openFromScanner(rid: string, vid: string) {
+    setRegionId(rid);
+    setVariableId(vid);
+    setCompareId('');
+    setDemo(null);
+    setRemoveSeason(true);
+    setView('explore');
+    window.scrollTo({ top: 0 });
+  }
+
   function startDemo(i: number) {
     setDemo(i);
     setRegionId(DEMOS[i].regionId);
@@ -117,6 +129,14 @@ export default function App() {
         </div>
       )}
 
+      <nav className="tabs">
+        <button className={view === 'explore' ? 'active' : ''} onClick={() => setView('explore')}>Explore a place</button>
+        <button className={view === 'scan' ? 'active' : ''} onClick={() => setView('scan')}>Scan everything for trends</button>
+      </nav>
+
+      {view === 'scan' && <Scanner onOpen={openFromScanner} />}
+
+      {view === 'explore' && (<>
       <section className="demos">
         <strong>Try an example:</strong>
         {DEMOS.map((d, i) => (
@@ -191,6 +211,7 @@ export default function App() {
           )}
         </div>
       </main>
+      </>)}
 
       <footer>
         Trends are linear (Theil-Sen slope, Mann-Kendall test). Real climate signals can be non-linear, and a trend does not prove its cause.

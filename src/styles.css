@@ -42,3 +42,17 @@ footer { margin-top: 20px; font-size: 12px; color: #7f93b3; }
 .demo-text p { margin: 0 0 6px; }
 .sources { font-size: 13px; color: #9fb3d1; }
 .sources a { color: #4fc3f7; margin-right: 12px; }
+
+.tabs { display: flex; gap: 8px; margin-bottom: 12px; }
+.tabs button { padding: 8px 14px; font-size: 15px; }
+.scanner h2 { margin: 6px 0; }
+.tablewrap { overflow-x: auto; margin-top: 8px; }
+table.scan { width: 100%; border-collapse: collapse; font-size: 14px; }
+table.scan th { text-align: left; color: #9fb3d1; padding: 6px 8px; border-bottom: 1px solid #2a3a55; }
+table.scan td { padding: 6px 8px; text-align: left; border-bottom: 1px solid #1d2c45; }
+table.scan tr.clickable { cursor: pointer; }
+table.scan tr.clickable:hover { background: #12233b; }
+.up { color: #ff8a65; } .down { color: #4fc3f7; }
+.bar { display: inline-block; width: 70px; height: 8px; background: #1d2c45; border-radius: 4px; margin-right: 6px; vertical-align: middle; }
+.bar span { display: block; height: 100%; background: #ffd23f; border-radius: 4px; }
+td.ok { color: #7be495; font-weight: 600; } td.maybe { color: #ffb74d; } td.none { color: #7f93b3; }
