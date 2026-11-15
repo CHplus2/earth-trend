@@ -306,3 +306,11 @@ details.legend-more .legend-note { margin: 4px 0 0; }
   .readout dd small { margin: 0; }
   .readout .conf { font-size: 16px; }
 }
+
+/* one toolbar row on wide screens */
+@media (min-width: 1100px) {
+  .toolbar { display: flex; gap: 14px; align-items: stretch; margin-bottom: 12px; }
+  .toolbar .mission { flex: 1 1 0; margin: 0; }
+  .toolbar .starters { flex: 1.05 1 0; margin: 0; }
+  .toolbar .mission button, .toolbar .starter { padding: 6px 10px; }
+}
