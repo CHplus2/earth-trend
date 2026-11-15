@@ -272,3 +272,4 @@ details.legend-more .legend-note { margin: 4px 0 0; }
 .legend-switch button { padding: 3px 10px; min-height: 28px; font-size: 13px; margin-top: 4px; }
 .wide-note { grid-column: 1 / -1; margin: 0; }
 .note.disagree { background: rgba(255,183,77,.08); border: 1px solid rgba(255,183,77,.35); border-radius: 8px; padding: 10px 12px; }
+.summary-action { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--line-soft); } .summary-action button.read { margin: 0; }

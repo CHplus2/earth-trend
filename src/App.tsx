@@ -330,8 +330,7 @@ export default function App() {
           {!error && !series && <p>Loading...</p>}
           {series && trend && (
             <>
-              {raw && <ReadAloud selector=".summary" />}
-              {raw && <div data-tour="summary"><Summary variableName={variable.name} regionName={region.name} unit={variable.unit} raw={raw} trend={trend} showPercent={variable.unit !== '°C'} /></div>}
+              {raw && <div data-tour="summary"><Summary variableName={variable.name} regionName={region.name} unit={variable.unit} raw={raw} trend={trend} showPercent={variable.unit !== '°C'} action={<ReadAloud selector=".summary .headline, .summary ul" />} /></div>}
               <div data-tour="chart"><TrendChart points={series} trend={trend} unit={variable.unit} anomalies={removeSeason} /></div>
               <details className="evidence" data-tour="stats"><summary>Show the statistics</summary><StatsCard trend={trend} unit={variable.unit} /></details>
               <details className="evidence" data-tour="explain"><summary>Is something else behind it? (El Niño, turning point)</summary><ExplainCard unit={variable.unit} variableName={variable.name} enso={enso} isNinoBox={regionId === 'nino34'} turning={turning} /></details>

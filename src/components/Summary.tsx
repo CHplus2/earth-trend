@@ -8,6 +8,8 @@ interface Props {
   trend: TrendResult;
   /** Percent of the average only makes sense for quantities with a true zero (not °C) */
   showPercent: boolean;
+  /** Optional control shown at the bottom of the card (e.g. read aloud) */
+  action?: React.ReactNode;
 }
 
 const fmt = (v: number) => {
@@ -22,7 +24,7 @@ function confidence(p: number): { label: string; cls: string } {
   return { label: 'No clear evidence', cls: 'no' };
 }
 
-export default function Summary({ variableName, regionName, unit, raw, trend, showPercent }: Props) {
+export default function Summary({ variableName, regionName, unit, raw, trend, showPercent, action }: Props) {
   const first = raw[0].date.slice(0, 4);
   const last = raw[raw.length - 1].date.slice(0, 4);
   const years = Math.round(trend.n / 12);
@@ -69,6 +71,7 @@ export default function Summary({ variableName, regionName, unit, raw, trend, sh
           </li>
         )}
       </ul>
+      {action && <div className="summary-action">{action}</div>}
     </div>
   );
 }

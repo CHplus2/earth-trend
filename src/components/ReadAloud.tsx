@@ -15,7 +15,7 @@ export default function ReadAloud({ selector }: { selector: string }) {
       setSpeaking(false);
       return;
     }
-    const text = document.querySelector(selector)?.textContent?.replace(/\s+/g, ' ').trim();
+    const text = Array.from(document.querySelectorAll(selector)).map((n) => n.textContent ?? '').join('. ').replace(/\s+/g, ' ').trim();
     if (!text) return;
     const u = new SpeechSynthesisUtterance(text);
     u.lang = 'en';
