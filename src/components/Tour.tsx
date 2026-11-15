@@ -59,7 +59,10 @@ interface Props {
 
 export default function Tour({ onClose, onSetup }: Props) {
   const [i, setI] = useState(0);
-  const [playing, setPlaying] = useState(false);
+  // "Watch the demo" plays by itself. People who prefer reduced motion start paused.
+  const [playing, setPlaying] = useState(
+    () => typeof window !== 'undefined' && !window.matchMedia('(prefers-reduced-motion: reduce)').matches,
+  );
   const step = STEPS[i];
   const setupDone = useRef(false);
   const setup = useRef(onSetup);
@@ -99,7 +102,7 @@ export default function Tour({ onClose, onSetup }: Props) {
       setPlaying(false);
       return;
     }
-    const id = window.setTimeout(() => setI((n) => n + 1), 9000);
+    const id = window.setTimeout(() => setI((n) => n + 1), 10000);
     return () => window.clearTimeout(id);
   }, [playing, i]);
 
@@ -122,7 +125,7 @@ export default function Tour({ onClose, onSetup }: Props) {
         ) : (
           <button className="active" onClick={onClose}>Finish</button>
         )}
-        <button onClick={() => setPlaying((p) => !p)} aria-pressed={playing}>{playing ? 'Pause' : 'Auto-play'}</button>
+        <button onClick={() => setPlaying((p) => !p)} aria-pressed={playing}>{playing ? 'Pause' : 'Play'}</button>
         <button onClick={onClose}>Close</button>
       </div>
     </aside>
