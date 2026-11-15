@@ -77,7 +77,10 @@ export default function MapPicker({ selectedId, onSelect, filter, mode, trends, 
           fillOpacity = active ? 0.6 : dim ? 0.05 : 0.3;
           opacity = dim ? 0.3 : 1;
         }
-        if (mode === 'trend' && filter !== 'all' && r.type !== filter && !active) opacity = Math.min(opacity, 0.3);
+        if (filter !== 'all' && r.type !== filter && !active) {
+          fillOpacity = 0.03;
+          opacity = 0.25;
+        }
 
         return (
           <Rectangle

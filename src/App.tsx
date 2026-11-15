@@ -96,6 +96,15 @@ export default function App() {
     }
   }
 
+  function chooseCategory(k: 'all' | 'land' | 'ocean') {
+    setMapFilter(k);
+    // The trend colours depend on the variable, so move to a region and variable of this kind.
+    if (k !== 'all' && region.type !== k) {
+      const first = REGIONS.find((r) => r.type === k);
+      if (first) pickRegion(first.id);
+    }
+  }
+
   function variableOptions(exclude?: string) {
     const groups: Array<['atmosphere' | 'land' | 'ocean', string]> = [
       ['atmosphere', 'Atmosphere'],
@@ -136,8 +145,10 @@ export default function App() {
   return (
     <div className="app">
       <header>
-        <h1>Earth System Trend Detective</h1>
-        <p>Pick a place and a variable. Find out what is changing, where, by how much, and whether it is significant.</p>
+        <h1>Terra Trace</h1>
+        <p className="tagline">
+          Earth System Trend Detective. Find what is really changing on Earth, where, by how much, and how sure we are.
+        </p>
       </header>
 
       {synthetic && (
@@ -157,12 +168,14 @@ export default function App() {
 
       {view === 'explore' && (<>
       <section className="demos">
-        <strong>Try an example:</strong>
-        {DEMOS.map((d, i) => (
-          <button key={d.title} className={demo === i ? 'active' : ''} onClick={() => startDemo(i)}>
-            {d.title}
-          </button>
-        ))}
+        <span className="label">Not sure where to start? Try an example:</span>
+        <div className="demo-buttons">
+          {DEMOS.map((d, i) => (
+            <button key={d.title} className={demo === i ? 'active' : ''} onClick={() => startDemo(i)}>
+              {d.title}
+            </button>
+          ))}
+        </div>
         {demo !== null && (
           <div className="demo-text">
             <p>{DEMOS[demo].text}</p>
@@ -185,9 +198,9 @@ export default function App() {
             <button className={mapMode === 'trend' ? 'active' : ''} onClick={() => setMapMode('trend')}>Trend</button>
             <button className={mapMode === 'category' ? 'active' : ''} onClick={() => setMapMode('category')}>Land / ocean</button>
             <span className="gap" />
-            <span>Show:</span>
+            <span>Show only:</span>
             {([['all', 'All'], ['land', 'Land'], ['ocean', 'Ocean']] as const).map(([k, label]) => (
-              <button key={k} className={mapFilter === k ? 'active' : ''} onClick={() => setMapFilter(k)}>{label}</button>
+              <button key={k} className={mapFilter === k ? 'active' : ''} onClick={() => chooseCategory(k)}>{label}</button>
             ))}
           </div>
           {mapMode === 'trend' ? (
@@ -228,7 +241,7 @@ export default function App() {
           {!error && !series && <p>Loading...</p>}
           {series && trend && (
             <>
-              {raw && <Summary variableName={variable.name} regionName={region.name} unit={variable.unit} raw={raw} trend={trend} />}
+              {raw && <Summary variableName={variable.name} regionName={region.name} unit={variable.unit} raw={raw} trend={trend} showPercent={variable.unit !== '°C'} />}
               <TrendChart points={series} trend={trend} unit={variable.unit} anomalies={removeSeason} />
               <StatsCard trend={trend} unit={variable.unit} />
             </>

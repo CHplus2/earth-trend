@@ -1,4 +1,6 @@
-# Earth System Trend Detective
+# Terra Trace
+
+*Earth System Trend Detective*
 
 NASA Space Apps 2026 challenge: *Be an Earth System Trend Detective.*
 

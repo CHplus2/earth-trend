@@ -6,11 +6,13 @@ interface Props {
   unit: string;
   raw: Point[];
   trend: TrendResult;
+  /** Percent of the average only makes sense for quantities with a true zero (not °C) */
+  showPercent: boolean;
 }
 
 const fmt = (v: number) => {
   const a = Math.abs(v);
-  return a >= 100 ? a.toFixed(0) : a >= 10 ? a.toFixed(1) : a >= 1 ? a.toFixed(2) : a.toFixed(3);
+  return a >= 100 ? a.toFixed(0) : a >= 10 ? a.toFixed(1) : a >= 0.1 ? a.toFixed(2) : a.toFixed(3);
 };
 
 function confidence(p: number): { label: string; cls: string } {
@@ -20,7 +22,7 @@ function confidence(p: number): { label: string; cls: string } {
   return { label: 'No clear evidence', cls: 'no' };
 }
 
-export default function Summary({ variableName, regionName, unit, raw, trend }: Props) {
+export default function Summary({ variableName, regionName, unit, raw, trend, showPercent }: Props) {
   const first = raw[0].date.slice(0, 4);
   const last = raw[raw.length - 1].date.slice(0, 4);
   const years = Math.round(trend.n / 12);
@@ -48,10 +50,10 @@ export default function Summary({ variableName, regionName, unit, raw, trend }: 
       <ul>
         <li>
           <strong>How much in total:</strong> about {fmt(trend.totalChange)} {unit} between {first} and {last}
-          {pct !== null && trend.significant ? ` (roughly ${pct < 1 ? '<1' : pct.toFixed(0)}% of the average level)` : ''}.
+          {showPercent && pct !== null && trend.significant ? ` (roughly ${pct < 1 ? '<1' : pct.toFixed(0)}% of the average level)` : ''}.
         </li>
         <li>
-          <strong>How sure are we:</strong> <span className={conf.cls}>{conf.label}</span> (p = {trend.mkPValue < 0.001 ? '< 0.001' : trend.mkPValue.toFixed(3)}).
+          <strong>How sure are we:</strong> <span className={conf.cls}>{conf.label}</span> ({trend.mkPValue < 0.001 ? 'p < 0.001' : 'p = ' + trend.mkPValue.toFixed(3)}).
           A p-value below 0.05 means a trend this strong would show up by luck less than 1 time in 20.
         </li>
         {years < 15 && (
