@@ -63,7 +63,7 @@ export function normCdf(z: number): number {
 }
 
 /** Two-sided p-value for a t statistic (normal approximation with df correction). */
-function tTwoSidedP(t: number, df: number): number {
+export function tTwoSidedP(t: number, df: number): number {
   // Convert t to an approximately normal z (Wallace 1959 approximation).
   const z = Math.sqrt(df * Math.log(1 + (t * t) / df)) * Math.sqrt(1 - 1 / (4 * df)) * Math.sign(t);
   return 2 * (1 - normCdf(Math.abs(z)));
@@ -79,7 +79,7 @@ function tCrit975(df: number): number {
   );
 }
 
-function lag1Autocorr(x: number[]): number {
+export function lag1Autocorr(x: number[]): number {
   const n = x.length;
   const mean = x.reduce((a, b) => a + b, 0) / n;
   let num = 0;
@@ -183,5 +183,73 @@ export function analyzeTrend(points: Point[], alpha = 0.05): TrendResult {
     totalChange: sen * (t[n - 1] - t[0]),
     intercept: intercept0,
     t0: t[0],
+  };
+}
+
+export interface CorrelationResult {
+  n: number;
+  /** Pearson r of the two series after removing each one's linear trend */
+  rDetrended: number;
+  /** Pearson r of the series as given (trends included) */
+  rRaw: number;
+  /** Effective sample size after allowing for autocorrelation */
+  nEff: number;
+  /** Two-sided p-value for rDetrended using nEff */
+  pDetrended: number;
+}
+
+function pearson(x: number[], y: number[]): number {
+  const n = x.length;
+  const mx = x.reduce((a, b) => a + b, 0) / n;
+  const my = y.reduce((a, b) => a + b, 0) / n;
+  let sxy = 0;
+  let sxx = 0;
+  let syy = 0;
+  for (let i = 0; i < n; i++) {
+    sxy += (x[i] - mx) * (y[i] - my);
+    sxx += (x[i] - mx) ** 2;
+    syy += (y[i] - my) ** 2;
+  }
+  return sxx === 0 || syy === 0 ? 0 : sxy / Math.sqrt(sxx * syy);
+}
+
+function detrend(points: Point[]): number[] {
+  const tr = analyzeTrend(points);
+  return points.map((p) => p.value - (tr.intercept + tr.sensSlopePerYear * (decimalYear(p.date) - tr.t0)));
+}
+
+/**
+ * Compare two monthly series over the months they share.
+ * Two series that both trend will correlate strongly even if unrelated, so the
+ * headline number is the correlation of the detrended series (do they rise and
+ * fall together from month to month?). The p-value uses an effective sample
+ * size reduced for autocorrelation.
+ */
+export function correlate(a: Point[], b: Point[]): CorrelationResult | null {
+  const mapB = new Map(b.map((p) => [p.date, p.value]));
+  const pa: Point[] = [];
+  const pb: Point[] = [];
+  for (const p of a) {
+    const v = mapB.get(p.date);
+    if (v !== undefined) {
+      pa.push(p);
+      pb.push({ date: p.date, value: v });
+    }
+  }
+  if (pa.length < 24) return null;
+  const da = detrend(pa);
+  const db = detrend(pb);
+  const r = pearson(da, db);
+  const ra = Math.max(0, lag1Autocorr(da));
+  const rb = Math.max(0, lag1Autocorr(db));
+  const n = pa.length;
+  const nEff = Math.min(n, Math.max(4, (n * (1 - ra * rb)) / (1 + ra * rb)));
+  const t = r * Math.sqrt((nEff - 2) / Math.max(1e-12, 1 - r * r));
+  return {
+    n,
+    rDetrended: r,
+    rRaw: pearson(pa.map((p) => p.value), pb.map((p) => p.value)),
+    nEff,
+    pDetrended: tTwoSidedP(t, nEff - 2),
   };
 }

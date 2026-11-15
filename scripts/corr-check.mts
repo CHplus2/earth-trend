@@ -1,0 +1,11 @@
+import { correlate } from '../src/lib/stats.ts';
+let s = 7;
+const rnd = () => ((s = (s * 1664525 + 1013904223) >>> 0) / 2 ** 32 - 0.5);
+const mk = (f: (i: number) => number) => Array.from({ length: 240 }, (_, i) => ({ date: `${2000 + Math.floor(i / 12)}-${String((i % 12) + 1).padStart(2, '0')}-01`, value: f(i) }));
+const shared = Array.from({ length: 240 }, () => rnd() * 4);
+const a = mk((i) => 0.05 * i + shared[i] + rnd());
+const b = mk((i) => -0.04 * i + 2 * shared[i] + rnd());
+const c = mk((i) => 0.03 * i + rnd() * 4);
+const r1 = correlate(a, b)!, r2 = correlate(a, c)!;
+console.log('linked  :', r1.rDetrended.toFixed(2), r1.pDetrended.toExponential(1), 'raw', r1.rRaw.toFixed(2));
+console.log('unlinked:', r2.rDetrended.toFixed(2), r2.pDetrended.toFixed(3), 'raw', r2.rRaw.toFixed(2));

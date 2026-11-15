@@ -110,19 +110,19 @@ export const DEMOS: DemoStep[] = [
   {
     regionId: 'china',
     variableId: 'no2',
-    title: 'Demo 1: Pollution falls in China',
+    title: 'Example 1: Pollution falls in China',
     text: 'NO2 over the North China Plain rose until about 2011, then dropped after clean-air policy began. Watch how the straight-line trend is smaller than the real change because the series bends.',
   },
   {
     regionId: 'india',
     variableId: 'no2',
-    title: 'Demo 2: Same pollutant, opposite direction',
+    title: 'Example 2: Same pollutant, opposite direction',
     text: 'Over the Indo-Gangetic Plain NO2 rises. The same variable trends down in China and the eastern US, yet each region follows its own causes.',
   },
   {
     regionId: 'california',
     variableId: 'tws',
-    title: 'Demo 3: A drying valley',
+    title: 'Example 3: A drying valley',
     text: 'Water storage in the Central Valley falls as groundwater is pumped during drought. Check whether the trend is significant after removing the seasonal cycle.',
   },
 ];

@@ -2,9 +2,11 @@ import { useEffect, useMemo, useState } from 'react';
 import MapPicker from './components/MapPicker';
 import TrendChart from './components/TrendChart';
 import StatsCard from './components/StatsCard';
+import CompareChart from './components/CompareChart';
+import CompareCard from './components/CompareCard';
 import { DEMOS, REGIONS, VARIABLES } from './lib/catalog';
 import { loadManifest, loadSeries } from './lib/data';
-import { analyzeTrend, deseasonalize } from './lib/stats';
+import { analyzeTrend, correlate, deseasonalize } from './lib/stats';
 import type { Point } from './lib/stats';
 
 export default function App() {
@@ -15,6 +17,9 @@ export default function App() {
   const [error, setError] = useState<string | null>(null);
   const [synthetic, setSynthetic] = useState(false);
   const [demo, setDemo] = useState<number | null>(null);
+  const [compareId, setCompareId] = useState('');
+  const [raw2, setRaw2] = useState<Point[] | null>(null);
+  const [error2, setError2] = useState<string | null>(null);
 
   const region = REGIONS.find((r) => r.id === regionId)!;
   const variable = VARIABLES.find((v) => v.id === variableId)!;
@@ -38,8 +43,29 @@ export default function App() {
     };
   }, [variableId, regionId]);
 
+  useEffect(() => {
+    let cancelled = false;
+    setRaw2(null);
+    setError2(null);
+    if (!compareId || compareId === variableId) return;
+    loadSeries(compareId, regionId)
+      .then((p) => {
+        const k = VARIABLES.find((v) => v.id === compareId)?.scale ?? 1;
+        if (!cancelled) setRaw2(k === 1 ? p : p.map((x) => ({ ...x, value: x.value * k })));
+      })
+      .catch((e: Error) => !cancelled && setError2(e.message));
+    return () => {
+      cancelled = true;
+    };
+  }, [compareId, variableId, regionId]);
+
   const series = useMemo(() => (raw ? (removeSeason ? deseasonalize(raw) : raw) : null), [raw, removeSeason]);
   const trend = useMemo(() => (series ? analyzeTrend(series) : null), [series]);
+
+  const series2 = useMemo(() => (raw2 ? (removeSeason ? deseasonalize(raw2) : raw2) : null), [raw2, removeSeason]);
+  const trend2 = useMemo(() => (series2 ? analyzeTrend(series2) : null), [series2]);
+  const corr = useMemo(() => (series && series2 ? correlate(series, series2) : null), [series, series2]);
+  const variable2 = VARIABLES.find((v) => v.id === compareId);
 
   function startDemo(i: number) {
     setDemo(i);
@@ -62,7 +88,7 @@ export default function App() {
       )}
 
       <section className="demos">
-        <strong>Guided demos:</strong>
+        <strong>Try an example:</strong>
         {DEMOS.map((d, i) => (
           <button key={d.title} className={demo === i ? 'active' : ''} onClick={() => startDemo(i)}>
             {d.title}
@@ -87,6 +113,15 @@ export default function App() {
                 ))}
               </select>
             </label>
+            <label>
+              Compare with
+              <select value={compareId} onChange={(e) => setCompareId(e.target.value)}>
+                <option value="">(none)</option>
+                {VARIABLES.filter((v) => v.id !== variableId).map((v) => (
+                  <option key={v.id} value={v.id}>{v.name}</option>
+                ))}
+              </select>
+            </label>
             <label className="check">
               <input type="checkbox" checked={removeSeason} onChange={(e) => setRemoveSeason(e.target.checked)} />
               Remove seasonal cycle
@@ -100,6 +135,19 @@ export default function App() {
             <>
               <TrendChart points={series} trend={trend} unit={variable.unit} anomalies={removeSeason} />
               <StatsCard trend={trend} unit={variable.unit} />
+            </>
+          )}
+
+          {compareId && compareId !== variableId && (
+            <>
+              <h2 className="sub">{variable.name} vs {variable2?.name}</h2>
+              {error2 && <div className="error">{error2}</div>}
+              {series && series2 && trend && trend2 && variable2 && (
+                <>
+                  <CompareChart a={series} b={series2} nameA={variable.name} nameB={variable2.name} unitA={variable.unit} unitB={variable2.unit} />
+                  <CompareCard nameA={variable.name} nameB={variable2.name} trendA={trend} trendB={trend2} corr={corr} />
+                </>
+              )}
             </>
           )}
         </div>
