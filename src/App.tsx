@@ -6,6 +6,7 @@ import CompareChart from './components/CompareChart';
 import CompareCard from './components/CompareCard';
 import Summary from './components/Summary';
 import Tour from './components/Tour';
+import CaseFile from './components/CaseFile';
 import Guide from './components/Guide';
 import ReadAloud from './components/ReadAloud';
 import ExplainCard from './components/ExplainCard';
@@ -28,6 +29,7 @@ export default function App() {
   const [synthetic, setSynthetic] = useState(false);
   const [demo, setDemo] = useState<number | null>(null);
   const [tour, setTour] = useState(false);
+  const [panel, setPanel] = useState<'guide' | 'cases' | null>(null);
   const [view, setView] = useState<'explore' | 'scan' | 'method'>('explore');
   const [trends, setTrends] = useState<Record<string, RegionTrend> | null>(null);
   const [mapLayer, setMapLayer] = useState<'variable' | 'temperature'>('temperature');
@@ -190,11 +192,15 @@ export default function App() {
   return (
     <div className="app">
       <a className="skip" href="#main">Skip to results</a>
-      <header>
-        <h1>Terra Trace</h1>
-        <p className="tagline">
-          Earth System Trend Detective. Find what is really changing on Earth, where, by how much, and how sure we are.
-        </p>
+      <header className="brand">
+        <div>
+          <p className="kicker">EARTH SYSTEM INTELLIGENCE</p>
+          <h1>Terra Trace</h1>
+          <p className="tagline">
+            Earth System Trend Detective. Find what is really changing on Earth, where, by how much, and how sure we are.
+          </p>
+        </div>
+        <span className="status"><i aria-hidden="true" /> OBSERVATORY ONLINE</span>
       </header>
 
       {synthetic && (
@@ -203,29 +209,46 @@ export default function App() {
         </div>
       )}
 
-      <nav className="tabs" aria-label="Sections">
-        <button className={view === 'explore' ? 'active' : ''} aria-current={view === 'explore' ? 'page' : undefined} onClick={() => setView('explore')}>Explore a place</button>
-        <button className={view === 'scan' ? 'active' : ''} aria-current={view === 'scan' ? 'page' : undefined} onClick={() => setView('scan')}>Scan everything for trends</button>
-        <button className={view === 'method' ? 'active' : ''} aria-current={view === 'method' ? 'page' : undefined} onClick={() => setView('method')}>How it works</button>
+      <nav className="mission" aria-label="Mission stages">
+        {([
+          ['explore', '1', 'Explore', 'Pick a place'],
+          ['scan', '2', 'Discover', 'Scan every trend'],
+          ['method', '3', 'Understand', 'How we know'],
+        ] as const).map(([k, n, name, sub]) => (
+          <button key={k} className={view === k ? 'active' : ''} aria-current={view === k ? 'page' : undefined} onClick={() => setView(k)}>
+            <span className="num" aria-hidden="true">{n}</span>
+            <span className="txt"><strong>{name}</strong><small>{sub}</small></span>
+          </button>
+        ))}
       </nav>
 
       {view === 'scan' && <Scanner onOpen={openFromScanner} />}
       {view === 'method' && <Method />}
 
       {view === 'explore' && (<>
-      <p className="tour-start">
-        <button className="active" onClick={() => { setView('explore'); setTour(true); }}>Watch a 1-minute demo</button>
-        <span className="muted"> A guided walk through one real case.</span>
-      </p>
+      <div className="starters" role="group" aria-label="Ways to start">
+        <button className="starter" onClick={() => { setPanel(null); setTour(true); }}>
+          <span className="ico" aria-hidden="true">▶</span>
+          <span><strong>Watch the demo</strong><small>1-minute guided case</small></span>
+        </button>
+        <button className="starter" aria-expanded={panel === 'guide'} onClick={() => setPanel(panel === 'guide' ? null : 'guide')}>
+          <span className="ico" aria-hidden="true">?</span>
+          <span><strong>Help me choose</strong><small>Two quick questions</small></span>
+        </button>
+        <button className="starter" aria-expanded={panel === 'cases'} onClick={() => setPanel(panel === 'cases' ? null : 'cases')}>
+          <span className="ico" aria-hidden="true">#</span>
+          <span><strong>Case library</strong><small>{DEMOS.length} real examples</small></span>
+        </button>
+      </div>
       {tour && <Tour onClose={() => setTour(false)} onSetup={setupTour} />}
 
-      <Guide onOpen={openFromScanner} />
+      {panel === 'guide' && <Guide onOpen={(r, v) => { openFromScanner(r, v); setPanel(null); }} />}
 
-      <section className="demos">
-        <span className="label">Not sure where to start? Try an example:</span>
+      {panel === 'cases' && (
+      <section className="demos" aria-label="Case library">
         <div className="demo-buttons">
           {DEMOS.map((d, i) => (
-            <button key={d.title} className={demo === i ? 'active' : ''} onClick={() => startDemo(i)}>
+            <button key={d.title} className={demo === i ? 'active' : ''} aria-pressed={demo === i} onClick={() => startDemo(i)}>
               {d.title}
             </button>
           ))}
@@ -244,6 +267,9 @@ export default function App() {
           </div>
         )}
       </section>
+      )}
+
+      <CaseFile variable={variable} region={region} trend={trend} enso={enso} turning={turning} loading={!series && !error} />
 
       <main id="main">
         <div className="left" data-tour="map">
@@ -311,8 +337,8 @@ export default function App() {
               {raw && <ReadAloud selector=".summary" />}
               {raw && <div data-tour="summary"><Summary variableName={variable.name} regionName={region.name} unit={variable.unit} raw={raw} trend={trend} showPercent={variable.unit !== '°C'} /></div>}
               <div data-tour="chart"><TrendChart points={series} trend={trend} unit={variable.unit} anomalies={removeSeason} /></div>
-              <div data-tour="stats"><StatsCard trend={trend} unit={variable.unit} /></div>
-              <div data-tour="explain"><ExplainCard unit={variable.unit} variableName={variable.name} enso={enso} isNinoBox={regionId === 'nino34'} turning={turning} /></div>
+              <details className="evidence" data-tour="stats"><summary>Show the statistics</summary><StatsCard trend={trend} unit={variable.unit} /></details>
+              <details className="evidence" data-tour="explain"><summary>Is something else behind it? (El Niño, turning point)</summary><ExplainCard unit={variable.unit} variableName={variable.name} enso={enso} isNinoBox={regionId === 'nino34'} turning={turning} /></details>
             </>
           )}
 

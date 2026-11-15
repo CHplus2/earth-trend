@@ -80,6 +80,8 @@ export default function Tour({ onClose, onSetup }: Props) {
     const t = window.setTimeout(() => {
       if (!step.target) return;
       el = document.querySelector(`[data-tour="${step.target}"]`);
+      // Open a collapsed evidence panel so the highlighted part is visible.
+      if (el instanceof HTMLDetailsElement) el.open = true;
       el?.classList.add('tour-hl');
       el?.scrollIntoView({ block: 'center' });
     }, 350);
