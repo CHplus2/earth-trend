@@ -10,11 +10,18 @@ Built with React, TypeScript and Vite. There is no backend: the statistics run i
 
 ## What it does
 
-- **Explore a place.** Click a region on the map (NASA GIBS imagery), choose a variable, and get a monthly chart with a trend line, a plain-language summary and the statistics behind it.
-- **Compare two variables** in the same region, with a correlation that ignores each variable's own long-term trend.
-- **Scan everything.** Tests every region and variable that has data, ranks them, and reports how many significant trends survive a correction for running many tests.
-- **Examples.** Six one-click examples written from the real results, with sources where available.
-- **How it works.** An in-app page with the method, data products and limits.
+The app has three stages, shown as the mission bar at the top.
+
+1. **Explore.** Pick a place on the map (NASA GIBS imagery) or in the Place menu, then a variable.
+   - A **case file** leads with the verdict: a stamp (significant rise, significant fall, inconclusive), the trend per decade and the confidence, plus badges such as "Turned around in 2012".
+   - Below it: a plain-language summary, a monthly chart with a trend line, and collapsible panels for the full statistics and for the "is something else behind it?" checks.
+   - The map colours each region by the trend of the selected variable. "All (temperature)" colours every region by temperature (air over land, sea surface over ocean).
+   - **Compare two variables** in the same region, with a correlation that ignores each variable's own long-term trend.
+   - Starter panels: **Watch the demo** (an 8-step guided tour that plays itself), **Help me choose** (two questions that pick a place and variable) and **Case library** (six examples with sources).
+2. **Discover.** Tests every region and variable that has data, ranks them, and reports how many significant trends survive a correction for running many tests.
+3. **Understand.** An in-app page with the method, data products and limits.
+
+Accessibility: keyboard-reachable Place menu as an alternative to the map, a skip link, visible focus, reduced-motion support, and a "Read result aloud" button with a voice picker (it uses the voices installed on the visitor's device).
 
 ## Run it
 
@@ -34,7 +41,7 @@ Files live in `public/data` and are named `<variable>__<region>.csv`, with two u
 | `tws` | Terrestrial water storage | GLDAS Catchment DA1 v2.2, daily | none (mm) |
 | `no2` | Tropospheric NO2 column | OMI OMNO2d v004, daily | molecules/cm² to ×10¹⁵ |
 | `sst` | Sea surface temperature | MODIS-Aqua 9 km, monthly (Day) | none (°C) |
-| `air850`, `air300` | Air temperature at 850 and 300 hPa | AIRS3STM v7.0, monthly (Daytime) | K to °C |
+| `air850`, `air300` | Lower-air (850 hPa) and upper-air (300 hPa) temperature | AIRS3STM v7.0, monthly (Daytime) | K to °C |
 
 Regions: Southern Amazon (`amazon`), Iberian Peninsula (`iberia`), California Central Valley (`california`), Indo-Gangetic Plain (`india`), North China Plain (`china`), Eastern US (`useast`), Tropical Pacific Nino 3.4 (`nino34`), North Atlantic (`natlantic`), Barents Sea (`barents`). Boxes are listed in `src/lib/catalog.ts`.
 
@@ -54,6 +61,10 @@ The Explore dropdowns, the scanner and the method page all read from the catalog
 4. Mann-Kendall test (with tie correction) for significance. When neighbouring months are positively correlated, the variance is widened by (1+r)/(1-r), a simplified allowance for autocorrelation.
 5. Comparison of two variables: Pearson correlation after removing each one's own trend, with an effective sample size reduced for autocorrelation.
 6. Scanner: Benjamini-Hochberg false-discovery control at 5% across all combinations.
+7. El Niño check: the Niño 3.4 sea surface temperature (its own trend removed) is fitted alongside time at lags of 0 to 6 months. Its fitted part is subtracted and the trend is tested again over the same months.
+8. Turning point: the single month that best splits the record into two straight lines (at least 7 years each). It is reported as a reversal only when both parts are significant and point in opposite directions. This is exploratory because the date is chosen from the data.
+
+When Theil-Sen and OLS disagree on direction or significance, the statistics panel explains why. The headline always uses Theil-Sen and Mann-Kendall.
 
 `scripts/` has small checks used during development (`stats-check.mts`, `corr-check.mts`, `data-check.mts`, `scan-check.mts`). They run with `node --experimental-strip-types scripts/<file>`.
 
@@ -67,15 +78,14 @@ The Explore dropdowns, the scanner and the method page all read from the catalog
 - The least-squares p-value is approximate and not adjusted for autocorrelation. Rely on Mann-Kendall.
 - Examples quote numbers computed from the files in `public/data`. If you replace a file, re-check the example text in `src/lib/catalog.ts`.
 
-## Deploy to Cloudflare Pages
+## Deploy to Cloudflare
 
-Connect the GitHub repository in Cloudflare Pages, then set:
+The repository includes `wrangler.jsonc`, which serves the built `dist/` folder as static assets. Connect the GitHub repository in Cloudflare (Workers and Pages), then use:
 
 - Build command: `npm run build`
-- Build output directory: `dist`
-- Framework preset: none, or Vite
+- Deploy command: `npx wrangler deploy`
 
-No environment variables are needed.
+No environment variables are needed. Every push to `main` rebuilds the site.
 
 ## Credits
 
