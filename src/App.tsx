@@ -6,6 +6,7 @@ import CompareChart from './components/CompareChart';
 import CompareCard from './components/CompareCard';
 import Summary from './components/Summary';
 import Scanner from './components/Scanner';
+import Method from './components/Method';
 import { DEMOS, REGIONS, VARIABLES } from './lib/catalog';
 import { loadManifest, loadVariableSeries } from './lib/data';
 import { analyzeTrend, correlate, deseasonalize } from './lib/stats';
@@ -19,7 +20,7 @@ export default function App() {
   const [error, setError] = useState<string | null>(null);
   const [synthetic, setSynthetic] = useState(false);
   const [demo, setDemo] = useState<number | null>(null);
-  const [view, setView] = useState<'explore' | 'scan'>('explore');
+  const [view, setView] = useState<'explore' | 'scan' | 'method'>('explore');
   const [compareId, setCompareId] = useState('');
   const [raw2, setRaw2] = useState<Point[] | null>(null);
   const [error2, setError2] = useState<string | null>(null);
@@ -132,9 +133,11 @@ export default function App() {
       <nav className="tabs">
         <button className={view === 'explore' ? 'active' : ''} onClick={() => setView('explore')}>Explore a place</button>
         <button className={view === 'scan' ? 'active' : ''} onClick={() => setView('scan')}>Scan everything for trends</button>
+        <button className={view === 'method' ? 'active' : ''} onClick={() => setView('method')}>How it works</button>
       </nav>
 
       {view === 'scan' && <Scanner onOpen={openFromScanner} />}
+      {view === 'method' && <Method />}
 
       {view === 'explore' && (<>
       <section className="demos">

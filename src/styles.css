@@ -56,3 +56,6 @@ table.scan tr.clickable:hover { background: #12233b; }
 .bar { display: inline-block; width: 70px; height: 8px; background: #1d2c45; border-radius: 4px; margin-right: 6px; vertical-align: middle; }
 .bar span { display: block; height: 100%; background: #ffd23f; border-radius: 4px; }
 td.ok { color: #7be495; font-weight: 600; } td.maybe { color: #ffb74d; } td.none { color: #7f93b3; }
+
+.method h2 { margin: 6px 0; } .method h3 { margin: 18px 0 6px; color: #ffd23f; font-size: 16px; }
+.method li { margin: 6px 0; line-height: 1.45; } .method p { line-height: 1.5; }

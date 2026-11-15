@@ -102,7 +102,7 @@ export const VARIABLES: Variable[] = [
     offset: -273.15,
     domain: 'atmosphere',
     regionTypes: ['land'],
-    giovanni: 'MERRA-2 M2TMNXSLV (monthly), 2-meter air temperature, converted from K to °C',
+    giovanni: 'MERRA-2 M2TMNXSLV v5.12.4 monthly, 2-meter air temperature; K converted to °C',
     definition:
       'Air temperature about 2 m above the ground, from the MERRA-2 reanalysis, which blends satellite and surface observations in a weather model.',
     years: '1980 to present',
@@ -114,7 +114,7 @@ export const VARIABLES: Variable[] = [
     scale: 24,
     domain: 'atmosphere',
     regionTypes: ['land'],
-    giovanni: 'GPM IMERG Final monthly (GPM_3IMERGM v07), precipitation, mm/hr x 24',
+    giovanni: 'GPM IMERG Final Run monthly (GPM_3IMERGM v07), merged satellite-gauge precipitation; mm/hr x 24 = mm/day',
     definition:
       'Average rainfall and snowfall estimated from the Global Precipitation Measurement constellation of satellites.',
     years: '2000 to present',
@@ -137,7 +137,7 @@ export const VARIABLES: Variable[] = [
     scale: 1e-15,
     domain: 'atmosphere',
     regionTypes: ['land'],
-    giovanni: 'OMI OMNO2d v004 (or monthly equivalent), tropospheric column, 30% cloud screened',
+    giovanni: 'OMI OMNO2d v004 daily, NO2 tropospheric column (30% cloud screened); the app averages days to months',
     definition:
       'The amount of nitrogen dioxide, a pollutant from traffic, power plants and industry, in the lower atmosphere above a spot, measured by the Ozone Monitoring Instrument.',
     years: '2004 to present',
