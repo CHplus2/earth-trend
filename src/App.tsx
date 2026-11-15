@@ -69,13 +69,13 @@ export default function App() {
     setRegionId(id);
     setDemo(null);
     // Keep the variable valid for this kind of region (land vs ocean).
-    if (variable.regionType !== r.type) {
-      const next = VARIABLES.find((v) => v.regionType === r.type);
+    if (!variable.regionTypes.includes(r.type)) {
+      const next = VARIABLES.find((v) => v.regionTypes.includes(r.type));
       if (next) setVariableId(next.id);
     }
     if (compareId) {
       const c = VARIABLES.find((v) => v.id === compareId);
-      if (c && c.regionType !== r.type) setCompareId('');
+      if (c && !c.regionTypes.includes(r.type)) setCompareId('');
     }
   }
 
@@ -88,8 +88,8 @@ export default function App() {
     return groups.map(([d, label]) => (
       <optgroup key={d} label={label}>
         {VARIABLES.filter((v) => v.domain === d && v.id !== exclude).map((v) => (
-          <option key={v.id} value={v.id} disabled={v.regionType !== region.type}>
-            {v.name}{v.regionType !== region.type ? ` (no data for ${region.type} regions)` : ''}
+          <option key={v.id} value={v.id} disabled={!v.regionTypes.includes(region.type)}>
+            {v.name}{!v.regionTypes.includes(region.type) ? ` (no data for ${region.type} regions)` : ''}
           </option>
         ))}
       </optgroup>

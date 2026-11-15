@@ -24,8 +24,8 @@ export interface Variable {
   offset?: number;
   /** Heading used in the dropdown */
   domain: 'land' | 'ocean' | 'atmosphere';
-  /** Which kind of region the data files exist for */
-  regionType: 'land' | 'ocean';
+  /** Which kinds of region data files exist for */
+  regionTypes: Array<'land' | 'ocean'>;
 }
 
 export const REGIONS: Region[] = [
@@ -101,7 +101,7 @@ export const VARIABLES: Variable[] = [
     unit: '°C',
     offset: -273.15,
     domain: 'atmosphere',
-    regionType: 'land',
+    regionTypes: ['land'],
     giovanni: 'MERRA-2 M2TMNXSLV (monthly), 2-meter air temperature, converted from K to °C',
     definition:
       'Air temperature about 2 m above the ground, from the MERRA-2 reanalysis, which blends satellite and surface observations in a weather model.',
@@ -113,7 +113,7 @@ export const VARIABLES: Variable[] = [
     unit: 'mm/day',
     scale: 24,
     domain: 'atmosphere',
-    regionType: 'land',
+    regionTypes: ['land'],
     giovanni: 'GPM IMERG Final monthly (GPM_3IMERGM v07), precipitation, mm/hr x 24',
     definition:
       'Average rainfall and snowfall estimated from the Global Precipitation Measurement constellation of satellites.',
@@ -124,7 +124,7 @@ export const VARIABLES: Variable[] = [
     name: 'Terrestrial water storage',
     unit: 'mm',
     domain: 'land',
-    regionType: 'land',
+    regionTypes: ['land'],
     giovanni: 'GLDAS Catchment CLSM025 DA1 daily v2.2, terrestrial water storage (averaged to monthly by the app)',
     definition:
       'All water held on land: soil moisture, groundwater, snow and surface water, as a depth of water in mm. Falling values mean the land is drying.',
@@ -136,7 +136,7 @@ export const VARIABLES: Variable[] = [
     unit: '1e15 molecules/cm²',
     scale: 1e-15,
     domain: 'atmosphere',
-    regionType: 'land',
+    regionTypes: ['land'],
     giovanni: 'OMI OMNO2d v004 (or monthly equivalent), tropospheric column, 30% cloud screened',
     definition:
       'The amount of nitrogen dioxide, a pollutant from traffic, power plants and industry, in the lower atmosphere above a spot, measured by the Ozone Monitoring Instrument.',
@@ -147,10 +147,34 @@ export const VARIABLES: Variable[] = [
     name: 'Sea surface temperature',
     unit: '°C',
     domain: 'ocean',
-    regionType: 'ocean',
+    regionTypes: ['ocean'],
     giovanni: 'MODIS-Aqua monthly 9 km, Sea Surface Temperature at 11 microns (Day), water only (MODISA_L3m_SST_Monthly_9km)',
     definition:
       'The temperature of the top layer of the ocean, measured by the MODIS instrument on NASA\'s Aqua satellite using infrared light. Ocean warming affects weather, sea ice and marine life.',
+    years: '2002 to present',
+  },
+  {
+    id: 'air850',
+    name: 'Air temperature, lower atmosphere (850 hPa)',
+    unit: '°C',
+    offset: -273.15,
+    domain: 'atmosphere',
+    regionTypes: ['ocean'],
+    giovanni: 'AIRS3STM v7.0 monthly, Air Temperature (Daytime/Ascending, AIRS-only), level 850 hPa, K converted to C',
+    definition:
+      'Air temperature about 1.5 km above the surface (the 850 hPa pressure level), measured by the AIRS infrared sounder on NASA\'s Aqua satellite.',
+    years: '2002 to present',
+  },
+  {
+    id: 'air300',
+    name: 'Air temperature, upper atmosphere (300 hPa)',
+    unit: '°C',
+    offset: -273.15,
+    domain: 'atmosphere',
+    regionTypes: ['ocean'],
+    giovanni: 'AIRS3STM v7.0 monthly, Air Temperature (Daytime/Ascending, AIRS-only), level 300 hPa, K converted to C',
+    definition:
+      'Air temperature about 9 km above the surface (the 300 hPa pressure level, near the top of the weather layer), measured by the AIRS infrared sounder on NASA\'s Aqua satellite.',
     years: '2002 to present',
   },
 ];
