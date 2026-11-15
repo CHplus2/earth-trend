@@ -16,7 +16,7 @@ import Method from './components/Method';
 import { computeRegionTrends } from './lib/regionTrends';
 import type { RegionTrend } from './lib/regionTrends';
 import { DEMOS, REGIONS, TEMPERATURE_EVERYWHERE, VARIABLES } from './lib/catalog';
-import { loadManifest, loadVariableSeries } from './lib/data';
+import { loadVariableSeries } from './lib/data';
 import { analyzeTrend, correlate, deseasonalize } from './lib/stats';
 import type { Point } from './lib/stats';
 
@@ -26,7 +26,6 @@ export default function App() {
   const [removeSeason, setRemoveSeason] = useState(true);
   const [raw, setRaw] = useState<Point[] | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [synthetic, setSynthetic] = useState(false);
   const [demo, setDemo] = useState<number | null>(null);
   const [tour, setTour] = useState(false);
   const [panel, setPanel] = useState<'guide' | 'cases' | null>(null);
@@ -42,7 +41,6 @@ export default function App() {
   const variable = VARIABLES.find((v) => v.id === variableId)!;
 
   useEffect(() => {
-    loadManifest().then((m) => setSynthetic(m.synthetic));
   }, []);
 
   useEffect(() => {
@@ -88,6 +86,14 @@ export default function App() {
       cancelled = true;
     };
   }, [variable, mapLayer]);
+
+  // When a variable other than temperature is chosen, the map follows it.
+  useEffect(() => {
+    if (mapLayer === 'temperature' && variableId !== 't2m' && variableId !== 'sst') {
+      setMapLayer('variable');
+      setMapFilter(region.type);
+    }
+  }, [variableId, regionId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const mapVariable = mapLayer === 'temperature' ? TEMPERATURE_EVERYWHERE : variable;
 
@@ -205,12 +211,6 @@ export default function App() {
         <span className="status"><i aria-hidden="true" /> OBSERVATORY ONLINE</span>
       </header>
 
-      {synthetic && (
-        <div className="banner">
-          Placeholder data: these series are synthetic, not NASA measurements. Replace the files in public/data with Giovanni downloads (see README).
-        </div>
-      )}
-
       <nav className="mission" aria-label="Mission stages">
         {([
           ['explore', '1', 'Explore', 'Pick a place'],
@@ -282,29 +282,12 @@ export default function App() {
             ))}
           </div>
           <p className="legend-line">
-            <span className="legend-title">Dots show: <strong>{mapVariable.name}</strong> trend</span>
+            <span className="legend-title">Trend of <strong>{mapLayer === 'temperature' ? 'temperature' : variable.name}</strong>{mapLayer === 'temperature' ? ' (land: air, ocean: sea surface)' : ` · ${mapFilter} regions`}</span>
             <span><i className="sw rise" /> rising</span>
             <span><i className="sw fall" /> falling</span>
             <span><i className="sw flat" /> no clear trend</span>
             <span><i className="sw none" /> no data</span>
           </p>
-          {mapLayer === 'temperature' && variableId !== 't2m' && variableId !== 'sst' && (
-            <p className="legend-switch">
-              The case file above is about <strong>{variable.name}</strong>, but the dots show temperature.{' '}
-              <button onClick={() => { setMapLayer('variable'); setMapFilter(region.type); }}>Colour the map by {variable.name}</button>
-            </p>
-          )}
-          <details className="legend-more">
-            <summary>About these colours</summary>
-          <p className="legend-note">
-            {mapLayer === 'temperature' ? (
-              <>Colours show the <strong>temperature</strong> trend: air temperature over land (1980 to 2026) and sea surface temperature over ocean (2002 to 2026). The records differ in length, so compare with care.</>
-            ) : (
-              <>Colours show the trend of <strong>{variable.name}</strong> ({mapFilter} regions only; it is the variable chosen in the menu). Dashed circles mean this variable has no data there; choose "All" to colour every region by temperature.</>
-            )}{' '}
-            Deeper colour means a clearer trend. Click a dot to open that region.
-          </p>
-          </details>
           <div role="region" aria-label="Map of regions. Keyboard and screen reader users can choose a place with the Place menu instead."><MapPicker selectedId={regionId} onSelect={selectFromMap} filter={mapFilter} trends={trends} variable={mapVariable} /></div>
           <p className="blurb"><strong>{region.name}:</strong> {region.blurb}</p>
         </div>
@@ -339,7 +322,7 @@ export default function App() {
               <input type="checkbox" checked={removeSeason} onChange={(e) => setRemoveSeason(e.target.checked)} />
               Remove seasonal cycle
             </label>
-            {!removeSeason && <p className="note wide-note">The case file and map always use the seasonal cycle removed. The chart and statistics below follow this setting.</p>}
+            {!removeSeason && <p className="note wide-note">The verdict at the top and the map always remove the seasonal cycle.</p>}
           </div>
           <p className="def"><strong>What is this?</strong> {variable.definition} <span className="muted">({variable.unit}, source record {variable.years})</span></p>
 
@@ -373,7 +356,7 @@ export default function App() {
 
       <footer>
         Trends are linear (Theil-Sen slope, Mann-Kendall test). Real climate signals can be non-linear, and a trend does not prove its cause.
-        Data: NASA Giovanni (MERRA-2, GPM IMERG, GLDAS, OMI). Imagery: NASA GIBS.
+        Data: NASA Giovanni (MERRA-2, GPM IMERG, GLDAS, OMI, MODIS-Aqua, AIRS). Imagery: NASA GIBS.
       </footer>
     </div>
   );
