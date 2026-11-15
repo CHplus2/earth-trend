@@ -323,3 +323,4 @@ select:hover { border-color: var(--link); }
 .read-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
 .read-row .voice { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--muted); }
 .read-row .voice select { width: auto; max-width: 220px; min-height: 34px; padding-top: 4px; padding-bottom: 4px; }
+select { padding-left: 12px; }

@@ -155,7 +155,7 @@ export const VARIABLES: Variable[] = [
   },
   {
     id: 'air850',
-    name: 'Air temperature, lower atmosphere (850 hPa)',
+    name: 'Lower-air temperature (850 hPa)',
     unit: '°C',
     offset: -273.15,
     domain: 'atmosphere',
@@ -167,7 +167,7 @@ export const VARIABLES: Variable[] = [
   },
   {
     id: 'air300',
-    name: 'Air temperature, upper atmosphere (300 hPa)',
+    name: 'Upper-air temperature (300 hPa)',
     unit: '°C',
     offset: -273.15,
     domain: 'atmosphere',
