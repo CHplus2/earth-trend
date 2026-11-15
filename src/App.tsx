@@ -6,7 +6,7 @@ import CompareChart from './components/CompareChart';
 import CompareCard from './components/CompareCard';
 import Summary from './components/Summary';
 import { DEMOS, REGIONS, VARIABLES } from './lib/catalog';
-import { loadManifest, loadSeries } from './lib/data';
+import { loadManifest, loadVariableSeries } from './lib/data';
 import { analyzeTrend, correlate, deseasonalize } from './lib/stats';
 import type { Point } from './lib/stats';
 
@@ -33,11 +33,8 @@ export default function App() {
     let cancelled = false;
     setRaw(null);
     setError(null);
-    loadSeries(variableId, regionId)
-      .then((p) => {
-        const k = VARIABLES.find((v) => v.id === variableId)?.scale ?? 1;
-        if (!cancelled) setRaw(k === 1 ? p : p.map((x) => ({ ...x, value: x.value * k })));
-      })
+    loadVariableSeries(variable, regionId)
+      .then((p) => !cancelled && setRaw(p))
       .catch((e: Error) => !cancelled && setError(e.message));
     return () => {
       cancelled = true;
@@ -49,11 +46,10 @@ export default function App() {
     setRaw2(null);
     setError2(null);
     if (!compareId || compareId === variableId) return;
-    loadSeries(compareId, regionId)
-      .then((p) => {
-        const k = VARIABLES.find((v) => v.id === compareId)?.scale ?? 1;
-        if (!cancelled) setRaw2(k === 1 ? p : p.map((x) => ({ ...x, value: x.value * k })));
-      })
+    const v2 = VARIABLES.find((v) => v.id === compareId);
+    if (!v2) return;
+    loadVariableSeries(v2, regionId)
+      .then((p) => !cancelled && setRaw2(p))
       .catch((e: Error) => !cancelled && setError2(e.message));
     return () => {
       cancelled = true;
@@ -67,6 +63,38 @@ export default function App() {
   const trend2 = useMemo(() => (series2 ? analyzeTrend(series2) : null), [series2]);
   const corr = useMemo(() => (series && series2 ? correlate(series, series2) : null), [series, series2]);
   const variable2 = VARIABLES.find((v) => v.id === compareId);
+
+  function pickRegion(id: string) {
+    const r = REGIONS.find((x) => x.id === id)!;
+    setRegionId(id);
+    setDemo(null);
+    // Keep the variable valid for this kind of region (land vs ocean).
+    if (variable.regionType !== r.type) {
+      const next = VARIABLES.find((v) => v.regionType === r.type);
+      if (next) setVariableId(next.id);
+    }
+    if (compareId) {
+      const c = VARIABLES.find((v) => v.id === compareId);
+      if (c && c.regionType !== r.type) setCompareId('');
+    }
+  }
+
+  function variableOptions(exclude?: string) {
+    const groups: Array<['atmosphere' | 'land' | 'ocean', string]> = [
+      ['atmosphere', 'Atmosphere'],
+      ['land', 'Land'],
+      ['ocean', 'Ocean'],
+    ];
+    return groups.map(([d, label]) => (
+      <optgroup key={d} label={label}>
+        {VARIABLES.filter((v) => v.domain === d && v.id !== exclude).map((v) => (
+          <option key={v.id} value={v.id} disabled={v.regionType !== region.type}>
+            {v.name}{v.regionType !== region.type ? ` (no data for ${region.type} regions)` : ''}
+          </option>
+        ))}
+      </optgroup>
+    ));
+  }
 
   function startDemo(i: number) {
     setDemo(i);
@@ -100,7 +128,7 @@ export default function App() {
 
       <main>
         <div className="left">
-          <MapPicker selectedId={regionId} onSelect={(id) => { setRegionId(id); setDemo(null); }} />
+          <MapPicker selectedId={regionId} onSelect={pickRegion} />
           <p className="blurb"><strong>{region.name}:</strong> {region.blurb}</p>
         </div>
 
@@ -109,18 +137,14 @@ export default function App() {
             <label>
               Variable
               <select value={variableId} onChange={(e) => { setVariableId(e.target.value); setDemo(null); }}>
-                {VARIABLES.map((v) => (
-                  <option key={v.id} value={v.id}>{v.name}</option>
-                ))}
+                {variableOptions()}
               </select>
             </label>
             <label>
               Compare with
               <select value={compareId} onChange={(e) => setCompareId(e.target.value)}>
                 <option value="">(none)</option>
-                {VARIABLES.filter((v) => v.id !== variableId).map((v) => (
-                  <option key={v.id} value={v.id}>{v.name}</option>
-                ))}
+                {variableOptions(variableId)}
               </select>
             </label>
             <label className="check">

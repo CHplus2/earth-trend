@@ -1,4 +1,5 @@
 import type { Point } from './stats';
+import type { Variable } from './catalog';
 
 export interface Manifest {
   /** True while the CSVs in public/data are generated placeholders, not NASA data. */
@@ -54,4 +55,12 @@ export async function loadManifest(): Promise<Manifest> {
   } catch {
     return { synthetic: false };
   }
+}
+
+/** Load a series and convert it to the variable's display unit. */
+export async function loadVariableSeries(v: Variable, regionId: string): Promise<Point[]> {
+  const pts = await loadSeries(v.id, regionId);
+  const k = v.scale ?? 1;
+  const off = v.offset ?? 0;
+  return k === 1 && off === 0 ? pts : pts.map((x) => ({ ...x, value: x.value * k + off }));
 }
