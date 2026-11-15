@@ -109,7 +109,7 @@ export default function Tour({ onClose, onSetup }: Props) {
   }, [onClose]);
 
   return (
-    <aside className="tour" role="dialog" aria-label="Guided tour" aria-live="polite">
+    <aside className={`tour${step.target && step.target !== 'map' ? ' tour-left' : ''}`} role="dialog" aria-label="Guided tour" aria-live="polite">
       <p className="tour-count">Step {i + 1} of {STEPS.length}</p>
       <h2>{step.title}</h2>
       <p>{step.text}</p>

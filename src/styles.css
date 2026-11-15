@@ -156,3 +156,4 @@ button.read { margin: 8px 0 0; }
 .tour-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
 .tour-hl { outline: 3px solid var(--accent); outline-offset: 4px; border-radius: 8px; }
 @media (max-width: 600px) { .tour { left: 8px; right: 8px; bottom: 8px; width: auto; } }
+@media (min-width: 901px) { .tour.tour-left { right: auto; left: 16px; } }

@@ -44,7 +44,7 @@ export default function ExplainCard({ unit, variableName, enso, isNinoBox, turni
         <>
           <p>
             El Niño and La Niña (warm and cool swings in the tropical Pacific) change weather worldwide. We removed their
-            effect from {variableName.toLowerCase()} (best fit: Pacific leads by {enso.lagMonths} month{enso.lagMonths === 1 ? '' : 's'};
+            effect from {variableName} (best fit: Pacific leads by {enso.lagMonths} month{enso.lagMonths === 1 ? '' : 's'};
             it explains {Math.round(enso.varianceShare * 100)}% of the month-to-month variation) and tested again.
           </p>
           <table>
@@ -53,7 +53,7 @@ export default function ExplainCard({ unit, variableName, enso, isNinoBox, turni
               <tr><td>Trend since {startYear}, El Niño removed</td><td>{fmt(enso.after.sensSlopePerDecade)} {unit}/decade {enso.after.significant ? '(significant)' : '(not significant)'}</td></tr>
             </tbody>
           </table>
-          <p><strong>{ensoSentence(enso)}</strong> The El Niño index only exists in this tool from {startYear}, so this check covers that period.</p>
+          <p><strong>{ensoSentence(enso)}</strong> This check covers only the months where both records exist (since {startYear}).</p>
         </>
       )}
 
