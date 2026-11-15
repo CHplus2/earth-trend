@@ -211,7 +211,6 @@ export default function App() {
         <span className="status"><i aria-hidden="true" /> NASA SATELLITE RECORDS</span>
       </header>
 
-      <div className="toolbar">
       <nav className="mission" aria-label="Mission stages">
         {([
           ['explore', '1', 'Explore', 'Pick a place'],
@@ -224,7 +223,11 @@ export default function App() {
           </button>
         ))}
       </nav>
-      {view === 'explore' && (
+
+      {view === 'scan' && <Scanner onOpen={openFromScanner} />}
+      {view === 'method' && <Method />}
+
+      {view === 'explore' && (<>
       <div className="starters" role="group" aria-label="Ways to start">
         <button className="starter" onClick={() => { setPanel(null); setTour(true); }}>
           <span className="ico play" aria-hidden="true" />
@@ -239,13 +242,6 @@ export default function App() {
           <span><strong>Case library</strong><small>{DEMOS.length} real examples</small></span>
         </button>
       </div>
-      )}
-      </div>
-
-      {view === 'scan' && <Scanner onOpen={openFromScanner} />}
-      {view === 'method' && <Method />}
-
-      {view === 'explore' && (<>
       {tour && <Tour onClose={() => setTour(false)} onSetup={setupTour} />}
 
       {panel === 'guide' && <Guide onOpen={(r, v) => { openFromScanner(r, v); setPanel(null); }} />}
