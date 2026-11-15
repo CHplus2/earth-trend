@@ -281,3 +281,13 @@ details.legend-more .legend-note { margin: 4px 0 0; }
 .readout dd { margin-top: 8px; gap: 4px; }
 .readout dd small { margin-top: 2px; }
 @media (min-width: 901px) { .readout { padding: 10px 14px; } }
+
+/* ---- review fixes ---- */
+.leaflet-container { background: #0a1a33; }
+.demo-buttons { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); }
+.demo-buttons button { text-align: left; }
+.card p, .card li { font-size: 14px; line-height: 1.55; }
+.card .verdict { font-size: 17px; }
+.up, .down { font-weight: 600; }
+.status i { animation: none; }
+@media (max-width: 560px) { .chips button { min-height: 36px; } }

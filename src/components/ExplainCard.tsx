@@ -33,8 +33,6 @@ export default function ExplainCard({ unit, variableName, enso, isNinoBox, turni
   const startYear = enso?.adjusted[0]?.date.slice(0, 4);
   return (
     <div className="card">
-      <h3>Is something else behind it?</h3>
-
       <h4>Is it just El Niño?</h4>
       {isNinoBox ? (
         <p className="muted">This box is the El Niño index itself, so the adjustment does not apply here.</p>

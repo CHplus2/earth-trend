@@ -208,7 +208,7 @@ export default function App() {
             Earth System Trend Detective. Find what is really changing on Earth, where, by how much, and how sure we are.
           </p>
         </div>
-        <span className="status"><i aria-hidden="true" /> OBSERVATORY ONLINE</span>
+        <span className="status"><i aria-hidden="true" /> NASA SATELLITE RECORDS</span>
       </header>
 
       <nav className="mission" aria-label="Mission stages">

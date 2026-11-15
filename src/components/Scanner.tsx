@@ -160,7 +160,7 @@ export default function Scanner({ onOpen }: Props) {
                 <td>{r.variableName}</td>
                 <td>{r.first} to {r.last}</td>
                 <td>
-                  <span className={r.perDecade >= 0 ? 'up' : 'down'}>{r.perDecade >= 0 ? '▲' : '▼'}</span> {fmt(r.perDecade)} {r.unit}
+                  <span className={r.perDecade >= 0 ? 'up' : 'down'}>{r.perDecade >= 0 ? 'Rising' : 'Falling'}</span> {fmt(r.perDecade)} {r.unit}
                 </td>
                 <td>
                   <span className="bar"><span style={{ width: `${Math.min(100, (Math.abs(r.z) / 8) * 100)}%` }} /></span> {Math.abs(r.z).toFixed(1)}
