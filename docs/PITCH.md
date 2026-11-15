@@ -1,26 +1,11 @@
-# Terra Trace: pitch notes
+# Terra Trace: notes for judges
+
+There is no live pitch. See `SUBMISSION.md` for the project page text, the 30-second video script and the slide outline.
 
 Live app: https://earth-trend.heroch94.workers.dev/
 
 ## One-line pitch
 Terra Trace lets anyone play data detective with NASA satellite records: pick a place, see whether something is really changing, and learn how sure we can be.
-
-## 2-minute script
-
-**Problem (15 s).** Satellites have recorded the Earth for decades, but the data sits in tables only specialists can read. Students and the public hear "pollution is falling" or "the Arctic is warming" and have no way to check it.
-
-**Solution (15 s).** Terra Trace turns NASA data into a plain-language answer. Nine regions on land and ocean, seven NASA variables: air temperature, rainfall, ground water, NO2 pollution, sea surface temperature and air temperature at two heights.
-
-**Demo (60 s).** Click "Watch the demo" (it plays itself), or do it live:
-1. Explore: North China Plain, NO2. The case file shows SIGNIFICANT FALL, -2.14 per decade, very strong evidence. The summary below says it in plain language.
-2. The chart and the badge "Turned around in 2012". NO2 rose until about 2012, then fell. A straight line alone would hide this.
-3. Open "Is something else behind it?". We remove El Nino swings and test again. The trend survives, so El Nino is not driving it.
-4. Discover stage. Every region and variable is tested at once. 19 of 33 combinations are significant, 18 survive a correction for running many tests.
-5. Contrast: Amazon ground water falling, India air temperature not significant. "Not significant" is a result too.
-
-**Why it is trustworthy (15 s).** Seasonal cycle removed. Theil-Sen slope and Mann-Kendall test, adjusted for neighbouring months being alike. Multiple-test correction. We say "consistent with", never "caused by".
-
-**Close (15 s).** Static site, no backend, runs on a phone, with a guided tour, Help me choose, read-aloud and a keyboard-friendly Place menu. Add more NASA regions by dropping in a CSV.
 
 ## Impact statement
 Audience: high school and college students, teachers and curious members of the public. Terra Trace shows how scientists decide whether a change is real, using real NASA measurements.
