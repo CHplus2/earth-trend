@@ -285,6 +285,8 @@ export default function App() {
             <span><i className="sw flat" /> no clear trend</span>
             <span><i className="sw none" /> no data</span>
           </p>
+          <details className="legend-more">
+            <summary>About these colours</summary>
           <p className="legend-note">
             {mapLayer === 'temperature' ? (
               <>Colours show the <strong>temperature</strong> trend: air temperature over land (1980 to 2026) and sea surface temperature over ocean (2002 to 2026). The records differ in length, so compare with care.</>
@@ -293,6 +295,7 @@ export default function App() {
             )}{' '}
             Deeper colour means a clearer trend. Click a dot to open that region.
           </p>
+          </details>
           <div role="region" aria-label="Map of regions. Keyboard and screen reader users can choose a place with the Place menu instead."><MapPicker selectedId={regionId} onSelect={selectFromMap} filter={mapFilter} trends={trends} variable={mapVariable} /></div>
           <p className="blurb"><strong>{region.name}:</strong> {region.blurb}</p>
         </div>
