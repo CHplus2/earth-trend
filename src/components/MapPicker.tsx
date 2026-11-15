@@ -1,4 +1,6 @@
 import { Fragment } from 'react';
+import { useEffect } from 'react';
+import { useMap } from 'react-leaflet';
 import { MapContainer, TileLayer, Rectangle, CircleMarker, Tooltip } from 'react-leaflet';
 import type { LatLngBoundsExpression } from 'leaflet';
 import { REGIONS } from '../lib/catalog';
@@ -29,18 +31,37 @@ const WORLD_VIEW: LatLngBoundsExpression = [
   [85, 180],
 ];
 
+/** Fit the whole world to the map's width and keep it from zooming out further. */
+function FitWorld() {
+  const map = useMap();
+  useEffect(() => {
+    const fit = () => {
+      map.invalidateSize();
+      const z = map.getBoundsZoom([[-60, -180], [85, 180]], false);
+      map.setMinZoom(z);
+      if (map.getZoom() < z) map.setZoom(z);
+    };
+    map.setView([22, 0], map.getBoundsZoom([[-60, -180], [85, 180]], false));
+    fit();
+    window.addEventListener('resize', fit);
+    return () => window.removeEventListener('resize', fit);
+  }, [map]);
+  return null;
+}
+
 export default function MapPicker({ selectedId, onSelect, filter, trends, variable }: Props) {
   return (
     <MapContainer
       center={[22, 10]}
-      zoom={1.5}
-      minZoom={1.5}
+      zoom={1.25}
+      minZoom={1}
       maxBounds={WORLD_VIEW}
       maxBoundsViscosity={1}
       zoomSnap={0.25}
       zoomDelta={0.5}
       className="map"
     >
+      <FitWorld />
       {/* NASA GIBS Blue Marble base layer: Earth imagery */}
       <TileLayer
         url="https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/BlueMarble_ShadedRelief_Bathymetry/default/GoogleMapsCompatible_Level8/{z}/{y}/{x}.jpeg"
