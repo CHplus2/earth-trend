@@ -5,6 +5,8 @@ import StatsCard from './components/StatsCard';
 import CompareChart from './components/CompareChart';
 import CompareCard from './components/CompareCard';
 import Summary from './components/Summary';
+import Guide from './components/Guide';
+import ReadAloud from './components/ReadAloud';
 import ExplainCard from './components/ExplainCard';
 import { adjustForEnso, findTurningPoint } from './lib/explain';
 import Scanner from './components/Scanner';
@@ -139,8 +141,8 @@ export default function App() {
 
   function variableOptions(exclude?: string) {
     const groups: Array<['atmosphere' | 'land' | 'ocean', string]> = [
-      ['atmosphere', 'Atmosphere'],
-      ['land', 'Land'],
+      ['atmosphere', 'Air and weather'],
+      ['land', 'Ground and water'],
       ['ocean', 'Ocean'],
     ];
     return groups.map(([d, label]) => {
@@ -176,6 +178,7 @@ export default function App() {
 
   return (
     <div className="app">
+      <a className="skip" href="#main">Skip to results</a>
       <header>
         <h1>Terra Trace</h1>
         <p className="tagline">
@@ -189,16 +192,18 @@ export default function App() {
         </div>
       )}
 
-      <nav className="tabs">
-        <button className={view === 'explore' ? 'active' : ''} onClick={() => setView('explore')}>Explore a place</button>
-        <button className={view === 'scan' ? 'active' : ''} onClick={() => setView('scan')}>Scan everything for trends</button>
-        <button className={view === 'method' ? 'active' : ''} onClick={() => setView('method')}>How it works</button>
+      <nav className="tabs" aria-label="Sections">
+        <button className={view === 'explore' ? 'active' : ''} aria-current={view === 'explore' ? 'page' : undefined} onClick={() => setView('explore')}>Explore a place</button>
+        <button className={view === 'scan' ? 'active' : ''} aria-current={view === 'scan' ? 'page' : undefined} onClick={() => setView('scan')}>Scan everything for trends</button>
+        <button className={view === 'method' ? 'active' : ''} aria-current={view === 'method' ? 'page' : undefined} onClick={() => setView('method')}>How it works</button>
       </nav>
 
       {view === 'scan' && <Scanner onOpen={openFromScanner} />}
       {view === 'method' && <Method />}
 
       {view === 'explore' && (<>
+      <Guide onOpen={openFromScanner} />
+
       <section className="demos">
         <span className="label">Not sure where to start? Try an example:</span>
         <div className="demo-buttons">
@@ -223,12 +228,12 @@ export default function App() {
         )}
       </section>
 
-      <main>
+      <main id="main">
         <div className="left">
           <div className="chips">
             <span>Map shows:</span>
             {([['all', 'All (temperature)'], ['land', 'Land'], ['ocean', 'Ocean']] as const).map(([k, label]) => (
-              <button key={k} className={mapFilter === k ? 'active' : ''} onClick={() => chooseCategory(k)}>{label}</button>
+              <button key={k} aria-pressed={mapFilter === k} className={mapFilter === k ? 'active' : ''} onClick={() => chooseCategory(k)}>{label}</button>
             ))}
           </div>
           <p className="legend-line">
@@ -245,12 +250,23 @@ export default function App() {
             )}{' '}
             Deeper colour means a clearer trend. Click a dot to open that region.
           </p>
-          <MapPicker selectedId={regionId} onSelect={selectFromMap} filter={mapFilter} trends={trends} variable={mapVariable} />
+          <div role="region" aria-label="Map of regions. Keyboard and screen reader users can choose a place with the Place menu instead."><MapPicker selectedId={regionId} onSelect={selectFromMap} filter={mapFilter} trends={trends} variable={mapVariable} /></div>
           <p className="blurb"><strong>{region.name}:</strong> {region.blurb}</p>
         </div>
 
         <div className="right">
           <div className="controls">
+            <label className="wide">
+              Place
+              <select value={regionId} onChange={(e) => pickRegion(e.target.value)}>
+                <optgroup label="Land">
+                  {REGIONS.filter((r) => r.type === 'land').map((r) => <option key={r.id} value={r.id}>{r.name}</option>)}
+                </optgroup>
+                <optgroup label="Ocean">
+                  {REGIONS.filter((r) => r.type === 'ocean').map((r) => <option key={r.id} value={r.id}>{r.name}</option>)}
+                </optgroup>
+              </select>
+            </label>
             <label>
               Variable
               <select value={variableId} onChange={(e) => { setVariableId(e.target.value); setDemo(null); }}>
@@ -260,7 +276,7 @@ export default function App() {
             <label>
               Compare with
               <select value={compareId} onChange={(e) => setCompareId(e.target.value)}>
-                <option value="">(none)</option>
+                <option value="">No comparison</option>
                 {variableOptions(variableId)}
               </select>
             </label>
@@ -275,6 +291,7 @@ export default function App() {
           {!error && !series && <p>Loading...</p>}
           {series && trend && (
             <>
+              {raw && <ReadAloud selector=".summary" />}
               {raw && <Summary variableName={variable.name} regionName={region.name} unit={variable.unit} raw={raw} trend={trend} showPercent={variable.unit !== '°C'} />}
               <TrendChart points={series} trend={trend} unit={variable.unit} anomalies={removeSeason} />
               <StatsCard trend={trend} unit={variable.unit} />
