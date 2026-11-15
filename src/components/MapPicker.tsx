@@ -89,7 +89,7 @@ export default function MapPicker({ selectedId, onSelect, filter, trends, variab
           dashed = true;
           label = `${r.name}: no ${variable.name.toLowerCase()} data`;
         } else if (t.sig) {
-          colour = t.z > 0 ? RISING : FALLING;
+          colour = t.perDecade > 0 ? RISING : FALLING;
           fillOpacity = Math.min(0.75, 0.4 + (Math.abs(t.z) / 8) * 0.35);
           label = `${r.name}: ${fmt(t.perDecade)} ${variable.unit} per decade`;
         }

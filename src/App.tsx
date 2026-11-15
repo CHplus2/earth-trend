@@ -110,6 +110,8 @@ export default function App() {
   }, []);
   const anomalies = useMemo(() => (raw ? deseasonalize(raw) : null), [raw]);
   const enso = useMemo(() => (anomalies && nino && regionId !== 'nino34' ? adjustForEnso(anomalies, nino) : null), [anomalies, nino, regionId]);
+  // The verdict and the map always use the seasonal cycle removed, so they match the Scanner.
+  const verdictTrend = useMemo(() => (anomalies ? analyzeTrend(anomalies) : null), [anomalies]);
   const turning = useMemo(() => (anomalies ? findTurningPoint(anomalies) : null), [anomalies]);
 
   const series2 = useMemo(() => (raw2 ? (removeSeason ? deseasonalize(raw2) : raw2) : null), [raw2, removeSeason]);
@@ -269,7 +271,7 @@ export default function App() {
       </section>
       )}
 
-      <CaseFile variable={variable} region={region} trend={trend} enso={enso} turning={turning} loading={!series && !error} />
+      <CaseFile variable={variable} region={region} trend={verdictTrend} enso={enso} turning={turning} loading={!series && !error} />
 
       <main id="main">
         <div className="left" data-tour="map">
@@ -280,11 +282,18 @@ export default function App() {
             ))}
           </div>
           <p className="legend-line">
+            <span className="legend-title">Dots show: <strong>{mapVariable.name}</strong> trend</span>
             <span><i className="sw rise" /> rising</span>
             <span><i className="sw fall" /> falling</span>
             <span><i className="sw flat" /> no clear trend</span>
             <span><i className="sw none" /> no data</span>
           </p>
+          {mapLayer === 'temperature' && variableId !== 't2m' && variableId !== 'sst' && (
+            <p className="legend-switch">
+              The case file above is about <strong>{variable.name}</strong>, but the dots show temperature.{' '}
+              <button onClick={() => { setMapLayer('variable'); setMapFilter(region.type); }}>Colour the map by {variable.name}</button>
+            </p>
+          )}
           <details className="legend-more">
             <summary>About these colours</summary>
           <p className="legend-note">
@@ -330,6 +339,7 @@ export default function App() {
               <input type="checkbox" checked={removeSeason} onChange={(e) => setRemoveSeason(e.target.checked)} />
               Remove seasonal cycle
             </label>
+            {!removeSeason && <p className="note wide-note">The case file and map always use the seasonal cycle removed. The chart and statistics below follow this setting.</p>}
           </div>
           <p className="def"><strong>What is this?</strong> {variable.definition} <span className="muted">({variable.unit}, source record {variable.years})</span></p>
 

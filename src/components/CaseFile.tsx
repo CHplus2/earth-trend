@@ -83,6 +83,9 @@ export default function CaseFile({ variable, region, trend, enso, turning, loadi
             <li className="badge ok">Not explained by El Niño</li>
           )}
           {enso && (enso.verdict === 'lost' || enso.verdict === 'weakened') && <li className="badge warn">Partly El Niño</li>}
+          {Math.sign(trend.olsSlopePerYear) !== Math.sign(trend.sensSlopePerYear) && (
+            <li className="badge warn">Slope methods disagree: see statistics</li>
+          )}
           {trend.n / 12 < 15 && <li className="badge warn">Short record ({Math.round(trend.n / 12)} years)</li>}
         </ul>
       )}

@@ -8,7 +8,24 @@ interface Props {
 const fmt = (v: number) => (Math.abs(v) >= 100 ? v.toFixed(1) : Math.abs(v) >= 1 ? v.toFixed(2) : v.toFixed(3));
 const fmtP = (p: number) => (p < 0.001 ? '< 0.001' : p.toFixed(3));
 
+function disagreement(trend: TrendResult): string | null {
+  const olsDir = Math.sign(trend.olsSlopePerYear);
+  const senDir = Math.sign(trend.sensSlopePerYear);
+  const olsSig = trend.olsPValue < 0.05;
+  if (olsDir !== senDir && !trend.significant && !olsSig) {
+    return 'The two slope estimates point in opposite directions (Theil-Sen ' + (senDir < 0 ? 'falling' : 'rising') + ', OLS ' + (olsDir < 0 ? 'falling' : 'rising') + '). This is not an error. Both slopes are tiny and neither passes its test, which is what a record with no real trend looks like. Theil-Sen takes the median of all month-to-month slopes, so a few unusual months barely move it. OLS fits a line through every point, so unusual months, especially near the ends, can tip it either way. The headline uses Theil-Sen and Mann-Kendall, and the answer is: no clear trend.';
+  }
+  if (olsSig && !trend.significant) {
+    return 'OLS says the trend is significant but the headline test (Mann-Kendall) does not. OLS treats every month as independent, but neighbouring months are alike, so it overstates how sure we can be. The headline test allows for that, so we trust it over the OLS p-value.';
+  }
+  if (!olsSig && trend.significant) {
+    return 'The headline test (Mann-Kendall) finds a significant trend but the OLS test does not. Mann-Kendall only asks whether values tend to rise or fall, and a few extreme months do not affect it. OLS is more sensitive to such months, so it can show a weaker result. The direction of both slopes agrees.';
+  }
+  return null;
+}
+
 export default function StatsCard({ trend, unit }: Props) {
+  const note = disagreement(trend);
   const verb = trend.direction === 'increasing' ? 'rising' : trend.direction === 'decreasing' ? 'falling' : 'flat';
   return (
     <div className="card">
@@ -37,6 +54,9 @@ export default function StatsCard({ trend, unit }: Props) {
           <tr><td>Lag-1 autocorrelation</td><td>{trend.lag1.toFixed(2)}</td></tr>
         </tbody>
       </table>
+      {note && (
+        <p className="note disagree"><strong>Why do the two methods differ?</strong> {note}</p>
+      )}
       {trend.autocorrAdjusted && (
         <p className="note">
           Month-to-month values are correlated, so the Mann-Kendall variance was widened to avoid overstating significance. The OLS p-value is not adjusted and is likely too optimistic.
