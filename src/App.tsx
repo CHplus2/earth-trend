@@ -4,6 +4,7 @@ import TrendChart from './components/TrendChart';
 import StatsCard from './components/StatsCard';
 import CompareChart from './components/CompareChart';
 import CompareCard from './components/CompareCard';
+import Summary from './components/Summary';
 import { DEMOS, REGIONS, VARIABLES } from './lib/catalog';
 import { loadManifest, loadSeries } from './lib/data';
 import { analyzeTrend, correlate, deseasonalize } from './lib/stats';
@@ -127,12 +128,13 @@ export default function App() {
               Remove seasonal cycle
             </label>
           </div>
-          <p className="def"><strong>{variable.name}</strong> ({variable.unit}, {variable.years}). {variable.definition}</p>
+          <p className="def"><strong>What is this?</strong> {variable.definition} <span className="muted">({variable.unit}, source record {variable.years})</span></p>
 
           {error && <div className="error">{error}</div>}
           {!error && !series && <p>Loading...</p>}
           {series && trend && (
             <>
+              {raw && <Summary variableName={variable.name} regionName={region.name} unit={variable.unit} raw={raw} trend={trend} />}
               <TrendChart points={series} trend={trend} unit={variable.unit} anomalies={removeSeason} />
               <StatsCard trend={trend} unit={variable.unit} />
             </>
