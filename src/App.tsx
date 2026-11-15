@@ -228,7 +228,7 @@ export default function App() {
       {view === 'explore' && (<>
       <div className="starters" role="group" aria-label="Ways to start">
         <button className="starter" onClick={() => { setPanel(null); setTour(true); }}>
-          <span className="ico" aria-hidden="true">▶</span>
+          <span className="ico play" aria-hidden="true" />
           <span><strong>Watch the demo</strong><small>1-minute guided case</small></span>
         </button>
         <button className="starter" aria-expanded={panel === 'guide'} onClick={() => setPanel(panel === 'guide' ? null : 'guide')}>
