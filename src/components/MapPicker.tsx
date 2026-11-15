@@ -5,9 +5,18 @@ import { REGIONS } from '../lib/catalog';
 interface Props {
   selectedId: string;
   onSelect: (id: string) => void;
+  /** Highlight only regions of this type; others are dimmed */
+  filter: 'all' | 'land' | 'ocean';
 }
 
-export default function MapPicker({ selectedId, onSelect }: Props) {
+// Land boxes are green, ocean boxes are blue. The selected one gets a lighter
+// fill of the same hue and a thick bright outline.
+const STYLE = {
+  land: { base: '#4caf50', light: '#a5f0a8' },
+  ocean: { base: '#2196f3', light: '#9bd3ff' },
+};
+
+export default function MapPicker({ selectedId, onSelect, filter }: Props) {
   return (
     <MapContainer center={[25, 10]} zoom={2} minZoom={2} worldCopyJump className="map">
       {/* NASA GIBS Blue Marble base layer: Earth imagery */}
@@ -23,14 +32,18 @@ export default function MapPicker({ selectedId, onSelect }: Props) {
           [n, e],
         ];
         const active = r.id === selectedId;
+        const dim = filter !== 'all' && r.type !== filter && !active;
+        const c = STYLE[r.type];
         return (
           <Rectangle
-            key={r.id}
+            key={`${r.id}-${filter}-${active}`}
             bounds={bounds}
             pathOptions={{
-              color: active ? '#ffd23f' : '#ffffff',
-              weight: active ? 3 : 2,
-              fillOpacity: active ? 0.35 : 0.15,
+              color: active ? c.light : c.base,
+              weight: active ? 4 : 2,
+              fillColor: active ? c.light : c.base,
+              fillOpacity: active ? 0.6 : dim ? 0.05 : 0.3,
+              opacity: dim ? 0.3 : 1,
             }}
             eventHandlers={{ click: () => onSelect(r.id) }}
           >

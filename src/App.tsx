@@ -21,6 +21,7 @@ export default function App() {
   const [synthetic, setSynthetic] = useState(false);
   const [demo, setDemo] = useState<number | null>(null);
   const [view, setView] = useState<'explore' | 'scan' | 'method'>('explore');
+  const [mapFilter, setMapFilter] = useState<'all' | 'land' | 'ocean'>('all');
   const [compareId, setCompareId] = useState('');
   const [raw2, setRaw2] = useState<Point[] | null>(null);
   const [error2, setError2] = useState<string | null>(null);
@@ -88,15 +89,17 @@ export default function App() {
       ['land', 'Land'],
       ['ocean', 'Ocean'],
     ];
-    return groups.map(([d, label]) => (
-      <optgroup key={d} label={label}>
-        {VARIABLES.filter((v) => v.domain === d && v.id !== exclude).map((v) => (
-          <option key={v.id} value={v.id} disabled={!v.regionTypes.includes(region.type)}>
-            {v.name}{!v.regionTypes.includes(region.type) ? ` (no data for ${region.type} regions)` : ''}
-          </option>
-        ))}
-      </optgroup>
-    ));
+    return groups.map(([d, label]) => {
+      const options = VARIABLES.filter((v) => v.domain === d && v.id !== exclude && v.regionTypes.includes(region.type));
+      if (options.length === 0) return null;
+      return (
+        <optgroup key={d} label={label}>
+          {options.map((v) => (
+            <option key={v.id} value={v.id}>{v.name}</option>
+          ))}
+        </optgroup>
+      );
+    });
   }
 
   function openFromScanner(rid: string, vid: string) {
@@ -164,7 +167,14 @@ export default function App() {
 
       <main>
         <div className="left">
-          <MapPicker selectedId={regionId} onSelect={pickRegion} />
+          <div className="chips">
+            <span>Show on map:</span>
+            {([['all', 'All'], ['land', 'Land'], ['ocean', 'Ocean']] as const).map(([k, label]) => (
+              <button key={k} className={mapFilter === k ? 'active' : ''} onClick={() => setMapFilter(k)}>{label}</button>
+            ))}
+            <span className="legend"><i className="sw land" /> land <i className="sw ocean" /> ocean</span>
+          </div>
+          <MapPicker selectedId={regionId} onSelect={pickRegion} filter={mapFilter} />
           <p className="blurb"><strong>{region.name}:</strong> {region.blurb}</p>
         </div>
 

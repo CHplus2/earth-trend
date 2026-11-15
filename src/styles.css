@@ -59,3 +59,13 @@ td.ok { color: #7be495; font-weight: 600; } td.maybe { color: #ffb74d; } td.none
 
 .method h2 { margin: 6px 0; } .method h3 { margin: 18px 0 6px; color: #ffd23f; font-size: 16px; }
 .method li { margin: 6px 0; line-height: 1.45; } .method p { line-height: 1.5; }
+
+.chips { display: flex; gap: 8px; align-items: center; margin-bottom: 8px; flex-wrap: wrap; font-size: 14px; color: #9fb3d1; }
+.chips button { padding: 4px 10px; }
+.legend { margin-left: auto; }
+.sw { display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin: 0 4px 0 8px; vertical-align: middle; }
+.sw.land { background: #4caf50; } .sw.ocean { background: #2196f3; }
+@media (min-width: 901px) {
+  main .left { position: sticky; top: 12px; align-self: start; }
+  main .left .map { height: calc(100vh - 150px); min-height: 360px; max-height: 620px; }
+}
